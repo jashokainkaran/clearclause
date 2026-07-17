@@ -1,0 +1,18 @@
+# Run logs
+outputs/runs/
+.runs/
+
+# Environment / secrets
+.env
+*.env
+!backend/.env.example
+
+# Claude Code project instructions (local only)
+CLAUDE.md
+
+# Python
+__pycache__/
+*.pyc
+
+# Editors
+.vscode/

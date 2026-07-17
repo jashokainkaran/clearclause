@@ -1,0 +1,108 @@
+/* ==========================================================================
+   ClearClause — Custom CSS
+   Only styles that Tailwind CDN cannot easily handle.
+   ========================================================================== */
+
+/* --- Fade-in keyframes -------------------------------------------------- */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Utility class applied to sections / cards that should animate in */
+.fade-in-up {
+  animation: fadeInUp 0.5s ease-out both;
+}
+
+.fade-in {
+  animation: fadeIn 0.4s ease-out both;
+}
+
+/* Stagger helper — add data-delay="1" / "2" / "3" etc. via JS */
+.fade-in-up[data-delay="1"] { animation-delay: 0.08s; }
+.fade-in-up[data-delay="2"] { animation-delay: 0.16s; }
+.fade-in-up[data-delay="3"] { animation-delay: 0.24s; }
+.fade-in-up[data-delay="4"] { animation-delay: 0.32s; }
+
+/* --- Pulsing dot loader ------------------------------------------------- */
+@keyframes pulse-dot {
+  0%, 80%, 100% {
+    opacity: 0.25;
+    transform: scale(0.8);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.cc-dots {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cc-dots .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #3b82f6;          /* blue-500 */
+  animation: pulse-dot 1.2s ease-in-out infinite;
+}
+
+.cc-dots .dot:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.cc-dots .dot:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+/* --- Textarea focus ring improvement ------------------------------------ */
+textarea:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);   /* blue-500 @ 25% */
+  border-color: #3b82f6;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+/* --- Card entrance (used for result cards) ------------------------------ */
+.card-enter {
+  animation: fadeInUp 0.45s ease-out both;
+}
+
+/* --- Smooth button hover lift ------------------------------------------- */
+.btn-lift {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.btn-lift:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+.btn-lift:active {
+  transform: translateY(0);
+}
+
+/* --- Blue left-border accent card --------------------------------------- */
+.accent-card-blue {
+  border-left: 4px solid #3b82f6;     /* blue-500 */
+}
+
+/* --- Monospace span text ------------------------------------------------ */
+.mono-span {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+  font-size: 0.85rem;
+  line-height: 1.6;
+}

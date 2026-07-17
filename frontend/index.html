@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/jpeg" href="icons/favicon.jpeg" />
+  <title>ClearClause — Faithful Legal Simplifier for Sri Lankan Statutes</title>
+  <meta name="description" content="ClearClause is an academic prototype that simplifies Sri Lankan statute provisions into clearer English while supporting traceability to the original legal text." />
+
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="css/custom.css" />
+
+  <!-- System font stack via Tailwind config -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: [
+              'Inter', 'ui-sans-serif', 'system-ui', '-apple-system',
+              'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue',
+              'Arial', 'Noto Sans', 'sans-serif'
+            ],
+          },
+        },
+      },
+    };
+  </script>
+
+  <!-- Google Font — Inter (optional progressive enhancement) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+
+<body class="bg-slate-50 text-slate-700 font-sans antialiased min-h-screen flex flex-col">
+
+  <!-- ===== Navbar ===== -->
+  <div id="navbar-container"></div>
+
+  <!-- ===== Disclaimer ===== -->
+  <div id="disclaimer-container" class="max-w-5xl mx-auto w-full px-4 sm:px-6 lg:px-8 mt-3"></div>
+
+  <!-- ===== Main Content ===== -->
+  <main class="flex-1 max-w-5xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-10 md:py-16">
+
+    <!-- Hero Section -->
+    <section class="fade-in-up grid md:grid-cols-2 gap-10 items-center">
+      <!-- Left column -->
+      <div>
+        <h1 class="text-3xl sm:text-4xl font-bold text-slate-900 tracking-tight leading-tight">
+          ClearClause
+        </h1>
+        <p class="mt-2 text-lg text-blue-600 font-medium">
+          Faithful Legal Simplifier for Sri Lankan Statutes
+        </p>
+        <p class="mt-4 text-slate-600 leading-relaxed">
+          ClearClause is an academic prototype that simplifies Sri Lankan statute provisions into clearer English while supporting traceability to the original legal text.
+        </p>
+        <div class="mt-6 flex flex-wrap items-center gap-4">
+          <a href="pages/simplify.html"
+             class="btn-lift inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-blue-600 text-white text-sm font-semibold shadow-sm hover:bg-blue-700 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+            Try it now
+            <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" /></svg>
+          </a>
+        </div>
+        <p class="mt-4 text-xs text-slate-400">Built as a Final Year Project prototype.</p>
+      </div>
+
+      <!-- Right column — Preview card -->
+      <div class="fade-in-up" data-delay="1">
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+          <!-- Card header -->
+          <div class="px-5 py-3 border-b border-slate-100 flex items-center gap-2">
+            <span class="inline-block w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+            <span class="text-xs font-semibold text-slate-500 uppercase tracking-wide">Example Output</span>
+          </div>
+          <!-- Card body -->
+          <div class="px-5 py-4 space-y-4 text-sm">
+            <!-- Original -->
+            <div>
+              <p class="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-1">Original</p>
+              <p class="text-slate-500 italic leading-relaxed">
+                "Whoever commits murder shall be punished with death."
+              </p>
+            </div>
+            <!-- Simplified -->
+            <div>
+              <p class="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-1">Simplified</p>
+              <p class="text-slate-700 leading-relaxed">
+                A person who commits murder must face the death penalty.
+              </p>
+            </div>
+            <!-- Badge -->
+            <div class="flex items-center gap-2">
+              <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-purple-100 text-purple-800">P1</span>
+              <span class="text-xs text-slate-400">Source span linked</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Feature Cards -->
+    <section class="mt-16 grid sm:grid-cols-3 gap-5">
+      <div class="fade-in-up bg-white rounded-lg border border-slate-200 p-5 hover:shadow-md transition-shadow duration-200" data-delay="1">
+        <div class="flex items-center justify-center w-9 h-9 rounded-lg bg-blue-50 text-blue-600 mb-3">
+          <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" /></svg>
+        </div>
+        <h3 class="text-sm font-semibold text-slate-800">Plain English Simplification</h3>
+        <p class="mt-1 text-sm text-slate-500 leading-relaxed">Converts complex legal provisions into clearer wording.</p>
+      </div>
+
+      <div class="fade-in-up bg-white rounded-lg border border-slate-200 p-5 hover:shadow-md transition-shadow duration-200" data-delay="2">
+        <div class="flex items-center justify-center w-9 h-9 rounded-lg bg-purple-50 text-purple-600 mb-3">
+          <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244" /></svg>
+        </div>
+        <h3 class="text-sm font-semibold text-slate-800">Source Traceability</h3>
+        <p class="mt-1 text-sm text-slate-500 leading-relaxed">Shows the original legal spans connected to the simplified output.</p>
+      </div>
+
+      <div class="fade-in-up bg-white rounded-lg border border-slate-200 p-5 hover:shadow-md transition-shadow duration-200" data-delay="3">
+        <div class="flex items-center justify-center w-9 h-9 rounded-lg bg-emerald-50 text-emerald-600 mb-3">
+          <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" /></svg>
+        </div>
+        <h3 class="text-sm font-semibold text-slate-800">Faithfulness Focus</h3>
+        <p class="mt-1 text-sm text-slate-500 leading-relaxed">Designed to support future claim-level verification using NLI.</p>
+      </div>
+    </section>
+
+    <!-- Academic note -->
+    <section class="mt-14 fade-in-up text-center" data-delay="4">
+      <p class="text-xs text-slate-400 max-w-xl mx-auto leading-relaxed">
+        Built as a Final Year Project prototype for faithful legal text simplification. This interface is connected to the FastAPI backend.
+      </p>
+    </section>
+  </main>
+
+  <!-- ===== Footer ===== -->
+  <footer class="py-4 text-center text-xs text-slate-400 border-t border-slate-100">
+    &copy; 2026 ClearClause
+  </footer>
+
+  <!-- ===== Scripts ===== -->
+  <script>
+    window.CLEARCLAUSE_BASE_PATH = ".";
+  </script>
+  <script src="js/app.js?v=2"></script>
+</body>
+</html>
