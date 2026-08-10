@@ -100,9 +100,16 @@ textarea:focus {
 }
 
 /* --- Monospace span text ------------------------------------------------ */
+/* pre-wrap preserves newlines and runs of spaces inside a source span, so the
+   span shown in the UI is visually faithful to the statutory text it came
+   from. Applied only here — claim text stays a normal collapsing paragraph.
+   overflow-wrap prevents a long unbroken statutory string from overflowing
+   the card now that whitespace is preserved. */
 .mono-span {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
     "Liberation Mono", "Courier New", monospace;
   font-size: 0.85rem;
   line-height: 1.6;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }

@@ -241,12 +241,28 @@
       resultsPanel.appendChild(originalSection);
 
       // Section A — Simplified Text
+      // The simplified text is split on blank lines and each paragraph is
+      // rendered as its own <p>. This keeps paragraph structure (the prompt
+      // asks for a blank line between separate rules or punishment branches)
+      // without using pre-wrap, so stray double-spaces and single soft line
+      // breaks are still collapsed by normal HTML wrapping. Each paragraph is
+      // escaped individually.
+      const simplifiedParagraphs = String(finalResult.simplified_text ?? "")
+        .split(/\n\s*\n/)
+        .map((para) => para.trim())
+        .filter((para) => para.length > 0)
+        .map(
+          (para) =>
+            `<p class="text-slate-700 leading-relaxed mb-3 last:mb-0">${escapeHtml(para)}</p>`
+        )
+        .join("");
+
       const simplifiedSection = document.createElement("section");
       simplifiedSection.className = "card-enter";
       simplifiedSection.innerHTML = `
         <h2 class="text-lg font-semibold text-slate-800 mb-3">Simplified Text</h2>
         <div class="bg-white rounded-lg border border-slate-200 accent-card-blue p-5">
-          <p class="text-slate-700 leading-relaxed">${escapeHtml(finalResult.simplified_text)}</p>
+          ${simplifiedParagraphs}
         </div>
       `;
       resultsPanel.appendChild(simplifiedSection);
@@ -255,13 +271,21 @@
       const claimsSection = document.createElement("section");
       claimsSection.className = "card-enter mt-8";
       let claimsHTML = `<h2 class="text-lg font-semibold text-slate-800 mb-3">Atomic Claims</h2>`;
+      claimsHTML += `<p class="text-xs text-slate-500 mb-3 italic">This percentage represents the model's confidence for this individual claim-evidence pair. It is not the model's overall accuracy or a guarantee of legal correctness.</p>`;
       finalResult.claims.forEach((claim, idx) => {
-        const spanLabel = claim.evidence_span_id ?? "—";
-
-        // Verification label badge and color formatting
-        const confidenceText = (claim.verification_confidence !== null && claim.verification_confidence !== undefined)
-          ? ` (${Math.round(claim.verification_confidence * 100)}%)`
-          : "";
+        // Evidence label. When the backend joined a headless continuation
+        // branch to its preceding span, evidence_span_ids holds BOTH ids and
+        // they are shown as "P1 + P2". The evidence text rendered below is the
+        // same combined text the NLI model received, so what the user sees is
+        // what the model scored.
+        const evidenceIds = Array.isArray(claim.evidence_span_ids)
+          ? claim.evidence_span_ids.filter(Boolean)
+          : [];
+        const spanLabel =
+          evidenceIds.length > 1
+            ? evidenceIds.join(" + ")
+            : claim.evidence_span_id ?? "—";
+        const isCombinedEvidence = evidenceIds.length > 1;
 
         let badgeColorClass = "bg-slate-100 text-slate-800";
         const labelVal = claim.verification_label ?? "unverified";
@@ -273,7 +297,51 @@
           badgeColorClass = "bg-amber-100 text-amber-800";
         }
 
-        const labelBadge = `<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold ${badgeColorClass}">${escapeHtml(labelVal)}${confidenceText}</span>`;
+        const labelBadge = `<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold ${badgeColorClass}">${escapeHtml(labelVal)}</span>`;
+
+        // NLI label confidence line — hidden entirely when the backend didn't
+        // run verification (no evidence linked, or verification failed).
+        // This is the softmax probability of the predicted NLI class, not a
+        // calibrated probability that the label is correct.
+        const hasConfidence = claim.verification_confidence !== null && claim.verification_confidence !== undefined;
+        const confidenceLine = hasConfidence
+          ? `<p class="text-xs text-slate-500 mt-2">NLI label confidence: ${(claim.verification_confidence * 100).toFixed(2)}%</p>`
+          : "";
+
+        // Evidence actually sent to the NLI model. Always rendered when
+        // present, and explicitly flagged when it is a combined
+        // previous + continuation-branch premise, so the backend can never
+        // silently verify against text the user was not shown.
+        const evidenceBlock = claim.evidence_text
+          ? `<details class="mt-2 text-xs text-slate-500"${isCombinedEvidence ? " open" : ""}>
+              <summary class="cursor-pointer select-none hover:text-slate-700">${
+                isCombinedEvidence
+                  ? `Evidence sent to model (combined ${escapeHtml(spanLabel)})`
+                  : "Evidence sent to model"
+              }</summary>
+              ${
+                isCombinedEvidence
+                  ? `<p class="mt-1 text-slate-400 italic">This branch is headless on its own, so the preceding span was joined to it before verification.</p>`
+                  : ""
+              }
+              <p class="mono-span mt-1 text-slate-600 bg-slate-50 rounded p-2">${escapeHtml(claim.evidence_text)}</p>
+            </details>`
+          : "";
+
+        // "Model details" is collapsed by default and only rendered when
+        // nli_probabilities is present, so older/incomplete responses
+        // (missing the field entirely) don't break rendering.
+        const probs = claim.nli_probabilities;
+        const modelDetails = probs
+          ? `<details class="mt-2 text-xs text-slate-500">
+              <summary class="cursor-pointer select-none hover:text-slate-700">Model details</summary>
+              <ul class="mt-1 ml-4 list-disc">
+                <li>Entailment: ${((probs.entailment ?? 0) * 100).toFixed(2)}%</li>
+                <li>Contradiction: ${((probs.contradiction ?? 0) * 100).toFixed(2)}%</li>
+                <li>Neutral: ${((probs.neutral ?? 0) * 100).toFixed(2)}%</li>
+              </ul>
+            </details>`
+          : "";
 
         claimsHTML += `
           <div class="bg-white rounded-lg border border-slate-200 p-4 mb-3 fade-in-up" data-delay="${idx + 1}">
@@ -283,6 +351,9 @@
               ${labelBadge}
             </div>
             <p class="text-slate-700 text-sm leading-relaxed">${escapeHtml(claim.claim_text)}</p>
+            ${confidenceLine}
+            ${evidenceBlock}
+            ${modelDetails}
           </div>
         `;
       });

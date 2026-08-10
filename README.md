@@ -89,8 +89,26 @@ python -m http.server 3000
 
 Then open `http://localhost:3000` in your browser.
 
+## Testing
+
+The backend's evidence-linking and NLI-verification logic have automated tests covering number handling, legal-modality tagging, retrieval tie-breaking, and NLI probability output. The tests don't require a live server or a model download — the NLI ones run against a mocked model.
+
+1. **Install dev dependencies** (from the `app/` root)
+
+   ```
+   pip install -r requirements-dev.txt
+   ```
+
+2. **Run the tests**
+
+   ```
+   python -m pytest
+   ```
+
+   Add `-v` for per-test output, or `python -m pytest tests/test_evidence.py` to run a single file.
+
 ## Notes
 
-- There is currently no test suite, linter, or CI configured in this repo.
+- There is currently no linter or CI configured in this repo.
 - Every call to `/pipeline` writes a full JSON snapshot of the result to `outputs/runs/` (git-ignored) — useful for inspecting a past run without re-calling the model.
 - This is an academic prototype, not a source of legal advice.

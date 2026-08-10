@@ -69,9 +69,17 @@ def run_pipeline(req: ProvisionRequest) -> SimplifyResponse:
             verification_label=c["verification_label"],
             nli_raw_label=c.get("nli_raw_label"),
             verification_confidence=c.get("verification_confidence"),
-            
-            # Backwards compatibility fields
-            evidence_span_ids=[c["evidence_span_id"]] if c.get("evidence_span_id") else [],
+            nli_probabilities=c.get("nli_probabilities"),
+
+            # evidence_span_ids now carries the spans actually sent to the NLI
+            # model. For an ordinary claim that is a single id; for a
+            # continuation branch it is [previous_id, selected_id], because
+            # evidence.link_claims_to_spans joined the preceding span to the
+            # headless branch. Falls back to the single selected id so older
+            # linked payloads (e.g. from the standalone /evidence endpoint)
+            # still populate this field.
+            evidence_span_ids=c.get("evidence_span_ids")
+            or ([c["evidence_span_id"]] if c.get("evidence_span_id") else []),
             label=c["verification_label"],
             label_confidence=c.get("verification_confidence") or 0.0,
         )

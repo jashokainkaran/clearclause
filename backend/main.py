@@ -77,13 +77,14 @@ def verify_endpoint(req: VerifyRequest):
     if not req.evidence_text.strip() or not req.claim_text.strip():
         raise HTTPException(status_code=422, detail="evidence_text and claim_text must not be empty")
     try:
-        verification_label, nli_raw_label, verification_confidence = verify_pair(
+        verification_label, nli_raw_label, verification_confidence, nli_probabilities = verify_pair(
             req.evidence_text.strip(), req.claim_text.strip()
         )
         return VerifyResponse(
             verification_label=verification_label,
             nli_raw_label=nli_raw_label,
             verification_confidence=verification_confidence,
+            nli_probabilities=nli_probabilities,
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

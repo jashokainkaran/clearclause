@@ -14,8 +14,19 @@ _PRIORITY_PATTERNS = re.compile(
 
 # ── Secondary patterns (structural) ───────────────────────────────────────────
 # Subsection markers like (1), (2), (a), (b), (aa), (bb), (i), (ii), (iii), (iv).
-# This avoids splitting random bracketed words such as (hereinafter).
+# The enumerator alternation avoids bracketed words such as (hereinafter).
+#
+# ANCHORING: the marker must also start the text, start a line, or follow
+# . ; : — or – (em dash / en dash). This is the same anchoring style used by
+# the priority and conjunctive patterns. Without the anchor the bare lookahead
+# fired on INLINE cross-references such as "subsection (1)", "paragraph (b)",
+# "section 12(2)" and "section 12 (2)", splitting mid-sentence and cutting a
+# cross-reference away from the rule it belongs to.
+#
+# The ordinary hyphen "-" is deliberately NOT a boundary: it appears inside
+# hyphenated words and ranges, where a split would be wrong.
 _SUBSECTION_PATTERN = re.compile(
+    r'(?m)(?:^|(?<=[\n.;:—–]))\s*'
     r'(?=\(\s*(?:\d+|[a-z]|([a-z])\1|i{1,3}|iv|v|vi{0,3}|ix|x)\s*\))',
     re.IGNORECASE,
 )
@@ -26,6 +37,32 @@ _SUBSECTION_PATTERN = re.compile(
 # "the place where the offence occurred".
 _CONJUNCTIVE_PATTERN = re.compile(
     r'(?m)(?:^|(?<=[\n.;:]))\s*(?=\b(?:Where|Unless|Except|Notwithstanding)\b)',
+    re.IGNORECASE,
+)
+
+# Semicolon-introduced alternative legal branches: "; or, if", "; and if",
+# "; or if", "; if". These separate an ordinary punishment branch from a
+# special / aggravated branch.
+#
+# Deliberately narrow: a bare ";" does NOT split, a comma does NOT split, and
+# a bare "or" does NOT split. Only a semicolon immediately introducing a
+# conditional branch splits, which keeps spans branch-level and coherent
+# instead of shattering a provision at every conjunction.
+#
+# IMPORTANT: a span produced by this split is HEADLESS — it lacks the subject
+# and the operative "shall be punished" phrase, which live in the preceding
+# span. evidence.link_claims_to_spans therefore pairs such a span with its
+# immediately preceding span before the text is sent to the NLI model. This
+# splitter must not be used without that continuation handling.
+_SEMICOLON_BRANCH_PATTERN = re.compile(
+    r'(?<=;)\s*(?=(?:(?:or|and)\s*,?\s*)?if\b)',
+    re.IGNORECASE,
+)
+
+# A chunk that opens with a structural enumerator, e.g. "(a) murder;".
+# Used to protect deliberate structural splits from the tiny-chunk merge.
+_STRUCTURAL_START = re.compile(
+    r'^\(\s*(?:\d+|[a-z]|([a-z])\1|i{1,3}|iv|v|vi{0,3}|ix|x)\s*\)',
     re.IGNORECASE,
 )
 
@@ -54,7 +91,8 @@ def make_spans(text: str) -> List[Span]:
 
     Strategy:
     1. Find priority split points (Provided that / Explanation / Illustration).
-    2. Find secondary split points (subsections, conjunctives, sentence boundaries).
+    2. Find secondary split points (anchored subsections, conjunctives,
+       semicolon-introduced branches, sentence boundaries).
     3. Drop any secondary split that is within MERGE_WINDOW chars of a priority split.
     4. Merge leftover tiny chunks (< 30 chars) into their neighbour.
     5. Return spans with offsets into the ORIGINAL raw input — never stripped.
@@ -84,6 +122,20 @@ def make_spans(text: str) -> List[Span]:
     # Conjunctive splits always included
     for m in _CONJUNCTIVE_PATTERN.finditer(text):
         all_splits.add(m.start())
+
+    # Semicolon branch splits always included. m.start() is the offset
+    # immediately AFTER the ";", so the semicolon stays with the preceding
+    # branch and the leading whitespace is stripped in step 3.
+    #
+    # Both m.start() and m.end() are recorded: step 3 advances a chunk's start
+    # past leading whitespace, so the chunk's actual_start equals m.end().
+    # The merge guard in step 4 compares against actual_start, and would miss
+    # the branch if only m.start() were stored.
+    branch_positions: Set[int] = set()
+    for m in _SEMICOLON_BRANCH_PATTERN.finditer(text):
+        all_splits.add(m.start())
+        branch_positions.add(m.start())
+        branch_positions.add(m.end())
 
     # Sentence boundary splits included ONLY if not near a priority split
     for m in _SENTENCE_PATTERN.finditer(text):
@@ -135,8 +187,18 @@ def make_spans(text: str) -> List[Span]:
             merged.append((actual_start, next_end, f"{visible.rstrip()} {next_visible.lstrip()}"))
             i += 2
 
-        elif merged and len(visible) < 30:
-            # Tiny leftover chunk — merge back into the previous span
+        elif (
+            merged
+            and len(visible) < 30
+            and actual_start not in branch_positions
+            and not _STRUCTURAL_START.match(visible)
+        ):
+            # Tiny leftover chunk — merge back into the previous span.
+            #
+            # Chunks that open a semicolon branch or a structural enumerator
+            # are exempt. Both are short by nature, and merging them would
+            # silently undo a split that was made deliberately (e.g. a short
+            # second punishment branch, or "(b) second rule.").
             prev_start, _, prev_visible = merged[-1]
             merged[-1] = (prev_start, actual_end, prev_visible + ' ' + visible)
             i += 1

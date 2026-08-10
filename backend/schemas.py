@@ -27,6 +27,7 @@ class Claim(BaseModel):
     verification_label: str
     nli_raw_label: Optional[str] = None
     verification_confidence: Optional[float] = None
+    nli_probabilities: Optional[dict[str, float]] = None
 
     # Keep compatibility with existing/old fields
     evidence_span_ids: Optional[List[str]] = None
@@ -41,6 +42,7 @@ class VerifyResponse(BaseModel):
     verification_label: str
     nli_raw_label: Optional[str] = None
     verification_confidence: Optional[float] = None
+    nli_probabilities: Optional[dict[str, float]] = None
 
 class SimplifyResponse(BaseModel):
     provision_id: str
