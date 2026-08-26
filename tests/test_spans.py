@@ -7,7 +7,15 @@ every assertion here is exact and offline.
 
 import pytest
 
-from backend.spans import make_spans
+from backend import spans as spans_module
+from backend.spans import (
+    make_spans,
+    make_spans_with_fallback,
+    make_spans_sentence_fallback,
+    validate_spans,
+    SpanValidationError,
+)
+from backend.schemas import Span
 
 
 # ---------------------------------------------------------------------------
@@ -292,3 +300,116 @@ def test_span_offsets_stay_within_the_source_text():
 
 def test_empty_text_returns_no_spans():
     assert make_spans("") == []
+
+
+# ---------------------------------------------------------------------------
+# validate_spans
+# ---------------------------------------------------------------------------
+
+def test_validate_spans_accepts_a_normal_valid_list():
+    text = "Whoever commits theft shall be punished."
+    spans = [Span(span_id="P1", text=text, start=0, end=len(text))]
+    validate_spans(spans, text)  # must not raise
+
+
+def test_validate_spans_rejects_empty_list():
+    with pytest.raises(SpanValidationError):
+        validate_spans([], "some text")
+
+
+def test_validate_spans_rejects_empty_span_text():
+    spans = [Span(span_id="P1", text="   ", start=0, end=3)]
+    with pytest.raises(SpanValidationError):
+        validate_spans(spans, "some text")
+
+
+def test_validate_spans_rejects_duplicate_ids():
+    spans = [
+        Span(span_id="P1", text="a", start=0, end=1),
+        Span(span_id="P1", text="b", start=1, end=2),
+    ]
+    with pytest.raises(SpanValidationError):
+        validate_spans(spans, "ab")
+
+
+def test_validate_spans_rejects_invalid_offsets():
+    spans = [Span(span_id="P1", text="a", start=5, end=1)]
+    with pytest.raises(SpanValidationError):
+        validate_spans(spans, "abcdef")
+
+
+def test_validate_spans_rejects_offsets_beyond_source_length():
+    spans = [Span(span_id="P1", text="a", start=0, end=100)]
+    with pytest.raises(SpanValidationError):
+        validate_spans(spans, "short text")
+
+
+# ---------------------------------------------------------------------------
+# make_spans_sentence_fallback (tier 2)
+# ---------------------------------------------------------------------------
+
+def test_sentence_fallback_splits_on_sentence_boundaries():
+    text = "The Court may impose a fine. The Court may also order imprisonment."
+    fallback_spans = make_spans_sentence_fallback(text)
+    assert len(fallback_spans) == 2
+    assert fallback_spans[0].text == "The Court may impose a fine."
+    assert fallback_spans[1].text == "The Court may also order imprisonment."
+
+
+def test_sentence_fallback_offsets_are_valid():
+    fallback_spans = make_spans_sentence_fallback(ABSCONDING)
+    for span in fallback_spans:
+        assert 0 <= span.start < span.end <= len(ABSCONDING)
+
+
+# ---------------------------------------------------------------------------
+# make_spans_with_fallback — the shared /spans + /pipeline entry point
+# ---------------------------------------------------------------------------
+
+def test_fallback_entry_point_normal_case_reports_success():
+    spans, status = make_spans_with_fallback(ABSCONDING)
+    assert status.status == "success"
+    assert status.method is None
+    assert spans == make_spans(ABSCONDING)
+
+
+def test_fallback_entry_point_falls_back_to_sentence_splitter_when_primary_invalid(monkeypatch):
+    monkeypatch.setattr(spans_module, "make_spans", lambda text: [])
+    text = "The Court may impose a fine. The Court may also order imprisonment."
+    result_spans, status = make_spans_with_fallback(text)
+    assert status.status == "fallback"
+    assert status.method == "sentence_splitter"
+    assert len(result_spans) == 2
+
+
+def test_fallback_entry_point_falls_back_to_full_provision_when_sentence_fallback_also_invalid(monkeypatch):
+    monkeypatch.setattr(spans_module, "make_spans", lambda text: [])
+    monkeypatch.setattr(spans_module, "make_spans_sentence_fallback", lambda text: [])
+    text = "The Court may impose a fine."
+    result_spans, status = make_spans_with_fallback(text)
+    assert status.status == "fallback"
+    assert status.method == "full_provision"
+    assert len(result_spans) == 1
+    assert result_spans[0].span_id == "P1"
+    assert result_spans[0].text == text
+    # No tier ever rewrites or invents source text.
+    assert result_spans[0].text == text[result_spans[0].start:result_spans[0].end]
+
+
+def test_fallback_entry_point_fails_only_when_source_itself_is_unusable():
+    # Defensive-only path: Stage 0 input validation (backend/schemas.py)
+    # already prevents empty text from ever reaching this function via the
+    # API, but calling it directly with empty text exercises the case
+    # where even the whole-provision tier cannot validate.
+    result_spans, status = make_spans_with_fallback("")
+    assert status.status == "failed"
+    assert status.reason is not None
+
+
+def test_fallback_never_rewrites_source_text(monkeypatch):
+    monkeypatch.setattr(spans_module, "make_spans", lambda text: [])
+    monkeypatch.setattr(spans_module, "make_spans_sentence_fallback", lambda text: [])
+    text = ABSCONDING
+    result_spans, status = make_spans_with_fallback(text)
+    assert status.method == "full_provision"
+    assert result_spans[0].text == text

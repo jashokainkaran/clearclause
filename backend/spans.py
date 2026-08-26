@@ -1,6 +1,6 @@
 import re
-from typing import List, Set
-from backend.schemas import Span
+from typing import List, Set, Tuple
+from backend.schemas import Span, StageStatus
 
 
 # ── Priority patterns (legal markers) ─────────────────────────────────────────
@@ -218,3 +218,122 @@ def make_spans(text: str) -> List[Span]:
         ))
 
     return spans
+
+
+class SpanValidationError(Exception):
+    """
+    Raised by validate_spans when a span list is unusable for downstream
+    stages. Callers must not proceed into simplification/evidence linking
+    if this fails — make_spans_with_fallback is what decides whether that
+    means trying a fallback splitter or truly stopping.
+    """
+    pass
+
+
+def validate_spans(spans: List[Span], source_text: str) -> None:
+    """
+    Lightweight, deterministic sanity check on a span list before it is
+    used downstream. Guards against the failure mode where an unexpected
+    input format or a splitter regression silently produces an empty,
+    malformed, or out-of-bounds span list.
+    """
+    if not spans:
+        raise SpanValidationError("Span generation produced no spans.")
+
+    seen_ids: Set[str] = set()
+    text_len = len(source_text)
+
+    for span in spans:
+        if not span.span_id:
+            raise SpanValidationError("A span is missing its span_id.")
+        if span.span_id in seen_ids:
+            raise SpanValidationError(f"Duplicate span_id: {span.span_id}")
+        seen_ids.add(span.span_id)
+
+        if not span.text or not span.text.strip():
+            raise SpanValidationError(f"Span {span.span_id} has empty text.")
+
+        if span.start < 0 or span.end < 0 or span.start >= span.end:
+            raise SpanValidationError(
+                f"Span {span.span_id} has invalid offsets (start={span.start}, end={span.end})."
+            )
+
+        if span.end > text_len:
+            raise SpanValidationError(
+                f"Span {span.span_id} end offset ({span.end}) exceeds source text length ({text_len})."
+            )
+
+
+def make_spans_sentence_fallback(text: str) -> List[Span]:
+    """
+    Fallback tier 2 of make_spans_with_fallback. Splits purely on sentence
+    boundaries — no subsection/priority/branch markers — reusing the same
+    _SENTENCE_PATTERN make_spans() already uses, rather than introducing a
+    second sentence-detection mechanism. Deliberately simpler than
+    make_spans(): fewer split rules means fewer ways for this tier itself
+    to produce something invalid.
+    """
+    if not text:
+        return []
+
+    split_points = sorted({0, len(text)} | {m.start() for m in _SENTENCE_PATTERN.finditer(text)})
+
+    spans: List[Span] = []
+    idx = 1
+    for i in range(len(split_points) - 1):
+        start, end = split_points[i], split_points[i + 1]
+        chunk = text[start:end]
+        stripped = chunk.strip()
+        if not stripped:
+            continue
+        leading_spaces = len(chunk) - len(chunk.lstrip())
+        actual_start = start + leading_spaces
+        spans.append(Span(span_id=f"P{idx}", text=stripped, start=actual_start, end=end))
+        idx += 1
+
+    return spans
+
+
+def make_spans_with_fallback(text: str) -> Tuple[List[Span], StageStatus]:
+    """
+    Shared span-generation entry point used by both the /spans endpoint and
+    the full pipeline, so the two can never disagree about what counts as
+    a valid split.
+
+    Tier 1: the normal structural splitter (make_spans), validated.
+    Tier 2 (only if tier 1 is invalid): a plain sentence-boundary fallback,
+            validated the same way.
+    Tier 3 (only if tier 2 is also invalid): the entire original text as
+            one span, P1.
+
+    No tier ever rewrites or invents source text — every fallback is an
+    exact substring (or the whole) of the original. Tier 3 can only fail
+    to validate if the source text itself is unusable, which Stage 0 input
+    validation (backend/schemas.py) already prevents — so in practice this
+    resolves to "success" or "fallback", essentially never "failed".
+    """
+    primary_spans = make_spans(text)
+    try:
+        validate_spans(primary_spans, text)
+        return primary_spans, StageStatus(status="success")
+    except SpanValidationError:
+        pass
+
+    fallback_spans = make_spans_sentence_fallback(text)
+    try:
+        validate_spans(fallback_spans, text)
+        return fallback_spans, StageStatus(status="fallback", method="sentence_splitter")
+    except SpanValidationError:
+        pass
+
+    whole_provision = [Span(span_id="P1", text=text, start=0, end=len(text))]
+    try:
+        validate_spans(whole_provision, text)
+        return whole_provision, StageStatus(status="fallback", method="full_provision")
+    except SpanValidationError as final_error:
+        # Defensive-only: unreachable in practice given Stage 0 guarantees
+        # non-empty input, but handled explicitly rather than assumed away.
+        return whole_provision, StageStatus(
+            status="failed",
+            reason=f"Source text could not be preserved as a usable span: {final_error}",
+        )

@@ -1,5 +1,6 @@
 import re
 from decimal import Decimal
+from typing import List, Optional
 
 # Common words that carry no legal meaning — excluded from matching.
 # NOTE: shall / may / must / not / can are deliberately NOT stopwords — they
@@ -81,6 +82,88 @@ def extract_numbers(text: str) -> set[str]:
     the general lexical tokenizer (see _tokenize).
     """
     return {_canonical_number(m) for m in _NUMBER_PATTERN.findall(text)}
+
+
+def extract_modality_tags(text: str) -> set[str]:
+    """
+    Public wrapper around _extract_modality_tags for external callers
+    (llm_client.py's claim-extraction warnings, pipeline.py's post-NLI
+    diagnostics) that need modality tags without going through the full
+    tokenizer.
+    """
+    return _extract_modality_tags(text.lower())
+
+
+def lexical_overlap(text_a: str, text_b: str) -> set[str]:
+    """
+    Lexical token intersection between two texts, using the same
+    normalisation/stopword rules as evidence retrieval. Used to detect
+    "zero meaningful overlap" between an extracted claim and the
+    simplified text it was supposedly extracted from — deliberately an
+    exact-zero check, not a tunable similarity threshold.
+    """
+    lex_a, _ = _tokenize_parts(text_a)
+    lex_b, _ = _tokenize_parts(text_b)
+    return lex_a & lex_b
+
+
+def detect_modal_conflict(text_a: str, text_b: str) -> bool:
+    """
+    True only for an unambiguous modality flip between two texts: one
+    contains PROHIBITION and not the other, while the other introduces
+    PERMISSION (or the mirror image). Deliberately narrow — a provision or
+    its simplification can legitimately mix several clauses with different
+    modal words (must / may / must not), so a broad difference in the
+    overall modality sets is not, by itself, evidence of an error. Only
+    this specific prohibition<->permission flip is unambiguous enough to
+    treat as an integrity problem; anything broader is left to the caller
+    to record as a non-blocking diagnostic instead.
+    """
+    tags_a = extract_modality_tags(text_a)
+    tags_b = extract_modality_tags(text_b)
+
+    flip_a_to_b = (
+        LEGAL_MODAL_PROHIBITION in tags_a
+        and LEGAL_MODAL_PROHIBITION not in tags_b
+        and LEGAL_MODAL_PERMISSION in tags_b
+    )
+    flip_b_to_a = (
+        LEGAL_MODAL_PROHIBITION in tags_b
+        and LEGAL_MODAL_PROHIBITION not in tags_a
+        and LEGAL_MODAL_PERMISSION in tags_a
+    )
+    return flip_a_to_b or flip_b_to_a
+
+
+def detect_verification_conflicts(
+    evidence_text: str, claim_text: str, verification_label: str
+) -> List[str]:
+    """
+    Post-NLI deterministic sanity check — a second, independent safety
+    signal alongside the NLI verdict, never a replacement for it. Only
+    meaningful for a claim the model called "supported": a model that
+    already said unsupported/uncertain has already flagged a problem
+    itself, so there is nothing extra to surface here.
+
+    Reuses the same number/modality primitives evidence retrieval already
+    relies on, so this is not a second scoring algorithm — just a
+    diagnostic comparison of what has already been extracted. Callers
+    (pipeline.py) must record these as warnings only; the NLI label itself
+    is never changed.
+    """
+    warnings: List[str] = []
+    if verification_label != "supported":
+        return warnings
+
+    evidence_numbers = extract_numbers(evidence_text)
+    claim_numbers = extract_numbers(claim_text)
+    if evidence_numbers and claim_numbers and evidence_numbers != claim_numbers:
+        warnings.append("numerical_conflict")
+
+    if detect_modal_conflict(evidence_text, claim_text):
+        warnings.append("clear_modal_conflict")
+
+    return warnings
 
 
 def _extract_modality_tags(text_lower: str) -> set[str]:
@@ -214,7 +297,38 @@ def resolve_evidence_units(spans: list) -> list[dict]:
     return units
 
 
-def link_claims_to_spans(claims: list[dict], spans: list) -> list[dict]:
+def _unresolved_result(claim: dict, source_text: Optional[str], method_if_fallback: str) -> dict:
+    """
+    Shared shape for the two "no single confident match" outcomes: a
+    genuine no-match, and an exact unresolved tie. Both prefer the whole
+    trusted provision over guessing, when it's available; otherwise the
+    claim simply has no evidence and will be reported as unverified
+    downstream.
+    """
+    if source_text:
+        return {
+            "claim_id": claim["claim_id"],
+            "claim_text": claim["claim_text"],
+            "evidence_span_id": None,
+            "evidence_span_ids": [],
+            "evidence_text": source_text,
+            "evidence_score": 0,
+            "evidence_method": method_if_fallback,
+        }
+    return {
+        "claim_id": claim["claim_id"],
+        "claim_text": claim["claim_text"],
+        "evidence_span_id": None,
+        "evidence_span_ids": [],
+        "evidence_text": None,
+        "evidence_score": 0,
+        "evidence_method": None,
+    }
+
+
+def link_claims_to_spans(
+    claims: list[dict], spans: list, source_text: Optional[str] = None
+) -> list[dict]:
     """
     For each claim, select the best SEMANTIC EVIDENCE UNIT (see
     resolve_evidence_units) and record what the NLI model should verify.
@@ -228,19 +342,26 @@ def link_claims_to_spans(claims: list[dict], spans: list) -> list[dict]:
       4. Prefer the more specific unit (a joined head+item) over a bare head
          — this attaches a claim that matches a terse list item to that item
          rather than to the general header it also happens to overlap.
-      5. First span encountered (stable).
 
-    A unit whose OWN span has zero lexical overlap is never selected, so a
-    claim with no matching evidence still gets a null
-    evidence_span_id/evidence_text, exactly as before.
+    No match (every unit scores 0) and an exact unresolved tie (two or
+    more units achieve the identical ranking key) are both treated as "the
+    deterministic rules cannot confidently pick a span" — rather than
+    quietly keeping an arbitrary first-seen winner, both cases prefer the
+    complete original provision as evidence when `source_text` is given
+    (whether it actually fits the NLI model is decided later, in
+    nli_client.py — this function stays unaware of tokenizer limits).
+    Without `source_text`, the claim simply gets no evidence.
 
-    Output fields (API-stable):
+    Output fields (API-stable, extended with two additive fields):
       - evidence_span_id  : the single primary selected span (provenance)
       - evidence_span_ids : the full unit — [head, item] for a headless span,
                             otherwise [selected]. This is what the NLI model
                             receives.
       - evidence_text     : the unit premise — exactly the text sent to DeBERTa
       - evidence_score    : integer lexical overlap against the OWN span
+      - evidence_method   : "lexical_overlap" | "full_provision" |
+                            "full_provision_ambiguity_fallback" | None
+      - evidence_ambiguity: True only when an exact tie was detected
     """
     units = resolve_evidence_units(spans)
     linked = []
@@ -251,6 +372,7 @@ def link_claims_to_spans(claims: list[dict], spans: list) -> list[dict]:
         best_key = None
         best_unit = None
         best_score = 0
+        tie_detected = False
 
         for unit in units:
             score = len(claim_words & unit["own_lex"])
@@ -268,24 +390,35 @@ def link_claims_to_spans(claims: list[dict], spans: list) -> list[dict]:
                 best_key = candidate_key
                 best_unit = unit
                 best_score = score
+                tie_detected = False
+            elif candidate_key == best_key:
+                tie_detected = True
 
-        if best_unit is None:
-            linked.append({
-                "claim_id": claim["claim_id"],
-                "claim_text": claim["claim_text"],
-                "evidence_span_id": None,
-                "evidence_span_ids": [],
-                "evidence_text": None,
-                "evidence_score": 0,
-            })
+        if best_unit is not None and tie_detected:
+            result = _unresolved_result(claim, source_text, "full_provision_ambiguity_fallback")
+            result["evidence_ambiguity"] = True
+        elif best_unit is None:
+            result = _unresolved_result(claim, source_text, "full_provision")
+            result["evidence_ambiguity"] = False
         else:
-            linked.append({
+            result = {
                 "claim_id": claim["claim_id"],
                 "claim_text": claim["claim_text"],
                 "evidence_span_id": best_unit["selected_id"],
                 "evidence_span_ids": list(best_unit["ids"]),
                 "evidence_text": best_unit["premise"],
                 "evidence_score": best_score,
-            })
+                "evidence_method": "lexical_overlap",
+                "evidence_ambiguity": False,
+            }
+
+        # Carry forward any diagnostic fields the caller already attached
+        # to the claim (e.g. claim-extraction's extraction_warnings) —
+        # this function only adds evidence-related fields, it must not
+        # silently drop what came in.
+        if "extraction_warnings" in claim:
+            result["extraction_warnings"] = claim["extraction_warnings"]
+
+        linked.append(result)
 
     return linked

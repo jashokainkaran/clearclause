@@ -19,6 +19,80 @@
   const API_BASE = "http://localhost:8000";
 
   /* -----------------------------------------------------------------------
+   * 2b. DEBUG TELEMETRY  (always-on, background only — never shown here)
+   *
+   * Publishes a snapshot of every /pipeline call — success, partial, or a
+   * structured failure — so a developer can open frontend/debug.html in a
+   * second tab and see internal stage execution without cluttering this
+   * page. Two channels, deliberately different in what they carry:
+   *
+   *   - BroadcastChannel: the FULL payload (including claim/evidence
+   *     text), live, in-memory only. Only reaches a debug tab that
+   *     happens to be open right now; never written to disk.
+   *   - localStorage: a SANITISED summary (ids, statuses, scores,
+   *     warnings, probabilities — no source/claim/evidence text), capped
+   *     to the last DEBUG_MAX_STORED_RUNS runs, so opening the debug page
+   *     later still shows something without persisting anything a user
+   *     pasted or the model generated.
+   *
+   * The channel/storage key names here MUST match frontend/js/debug.js.
+   * --------------------------------------------------------------------- */
+  const DEBUG_CHANNEL_NAME = "clearclause_pipeline_debug";
+  const DEBUG_STORAGE_KEY = "clearclause_pipeline_debug_runs";
+  const DEBUG_MAX_STORED_RUNS = 5;
+
+  const debugChannel = (typeof BroadcastChannel !== "undefined")
+    ? new BroadcastChannel(DEBUG_CHANNEL_NAME)
+    : null;
+
+  function sanitiseClaimForStorage(claim) {
+    return {
+      claim_id: claim.claim_id,
+      evidence_span_id: claim.evidence_span_id ?? null,
+      evidence_method: claim.evidence_method ?? null,
+      evidence_ambiguity: claim.evidence_ambiguity ?? null,
+      verification_label: claim.verification_label ?? null,
+      verification_confidence: claim.verification_confidence ?? null,
+      nli_probabilities: claim.nli_probabilities ?? null,
+      verification_reason: claim.verification_reason ?? null,
+      verification_warnings: claim.verification_warnings ?? null,
+      extraction_warnings: claim.extraction_warnings ?? null,
+    };
+  }
+
+  function publishDebugPayload(fullPayload) {
+    if (debugChannel) {
+      try {
+        debugChannel.postMessage(fullPayload);
+      } catch (_) {
+        // Structured-clone failure on an unusual payload shape — never
+        // let a debug-telemetry issue affect the actual app.
+      }
+    }
+
+    try {
+      const summary = {
+        run_id: fullPayload.run_id ?? null,
+        timestamp: fullPayload.timestamp,
+        provision_id: fullPayload.provision_id ?? null,
+        pipeline_status: fullPayload.pipeline_status ?? null,
+        provenance: fullPayload.provenance ?? null,
+        error: fullPayload.error ?? null,
+        claims: Array.isArray(fullPayload.claims)
+          ? fullPayload.claims.map(sanitiseClaimForStorage)
+          : [],
+      };
+      const existingRaw = localStorage.getItem(DEBUG_STORAGE_KEY);
+      const existing = existingRaw ? JSON.parse(existingRaw) : [];
+      const updated = [summary, ...existing].slice(0, DEBUG_MAX_STORED_RUNS);
+      localStorage.setItem(DEBUG_STORAGE_KEY, JSON.stringify(updated));
+    } catch (_) {
+      // localStorage unavailable/full/private-mode — non-critical, the
+      // live BroadcastChannel path above still worked if a tab was open.
+    }
+  }
+
+  /* -----------------------------------------------------------------------
    * 3. COMPONENT LOADING  (local static HTML snippets only)
    * --------------------------------------------------------------------- */
   async function loadComponent(containerId, componentPath) {
@@ -80,25 +154,52 @@
     });
 
     if (!res.ok) {
-      // Try to surface the FastAPI error detail if available
-      let detail = `Server error ${res.status}`;
+      // `detail` can be one of three shapes depending on where the
+      // request failed:
+      //   - a structured object {message, spans, pipeline_status} from a
+      //     core-stage failure (span generation / simplification) — the
+      //     technical message is kept on the thrown Error for the debug
+      //     publish step, but never shown to the user directly.
+      //   - a Pydantic validation-error list (request rejected before the
+      //     pipeline ever ran, e.g. empty/oversized input).
+      //   - a plain string, for anything else.
+      let userMessage = `Server error ${res.status}`;
+      let debugDetail = null;
       try {
-        const err = await res.json();
-        if (err.detail) detail = err.detail;
+        const errJson = await res.json();
+        const detail = errJson.detail;
+        if (typeof detail === "string") {
+          userMessage = detail;
+        } else if (detail && typeof detail === "object" && !Array.isArray(detail)) {
+          userMessage = detail.message || userMessage;
+          debugDetail = detail;
+        } else if (Array.isArray(detail) && detail.length > 0 && detail[0].msg) {
+          userMessage = detail[0].msg;
+        }
       } catch (_) { }
-      throw new Error(detail);
+      const error = new Error(userMessage);
+      error.debugPayload = debugDetail;
+      error.httpStatus = res.status;
+      throw error;
     }
 
     const data = await res.json();
 
     // Your backend /pipeline returns:
-    //   { provision_id, simplified_text, claims, spans, run_id }
-    // We map this to the shape the UI expects.
+    //   { provision_id, simplified_text, claims, spans, run_id,
+    //     pipeline_status, provenance }
+    // We map this to the shape the UI expects, and carry the new
+    // diagnostic fields through under _-prefixed keys purely for the
+    // debug-telemetry publish step — the normal UI never reads them.
     return {
       source_text: inputText,           // backend echoes text via provision_id; we keep original
       source_spans: data.spans,         // backend field is "spans"
       simplified_text: data.simplified_text,
       _claims: data.claims,             // carry claims through to runClaimExtraction
+      _run_id: data.run_id,
+      _provision_id: data.provision_id,
+      _pipeline_status: data.pipeline_status,
+      _provenance: data.provenance,
     };
   }
 
@@ -297,7 +398,12 @@
           badgeColorClass = "bg-amber-100 text-amber-800";
         }
 
-        const labelBadge = `<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold ${badgeColorClass}">${escapeHtml(labelVal)}</span>`;
+        // Internal reason codes (verification_reason) never surface here —
+        // the user sees a plain "Unable to verify" regardless of whether
+        // that was no evidence, an NLI model/inference failure, or an
+        // oversized input; the real reason stays in the debug page/API.
+        const displayLabel = labelVal === "unverified" ? "Unable to verify" : labelVal;
+        const labelBadge = `<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold ${badgeColorClass}">${escapeHtml(displayLabel)}</span>`;
 
         // NLI label confidence line — hidden entirely when the backend didn't
         // run verification (no evidence linked, or verification failed).
@@ -443,7 +549,20 @@
         console.error(err);
         hideLoading();
         inputPanel.classList.remove("hidden");
-        showErrorBanner(err.message || "Could not reach the backend.");
+        // The real technical reason (err.message / err.debugPayload) is
+        // never shown here — only in the debug page / API / logs. The
+        // normal UI always shows the same plain outcome.
+        publishDebugPayload({
+          run_id: err.debugPayload ? err.debugPayload.run_id : null,
+          timestamp: new Date().toISOString(),
+          provision_id: err.debugPayload ? err.debugPayload.provision_id : null,
+          pipeline_status: err.debugPayload ? err.debugPayload.pipeline_status : null,
+          spans: err.debugPayload ? err.debugPayload.spans : [],
+          claims: [],
+          provenance: null,
+          error: err.message,
+        });
+        showErrorBanner("The simplification could not be completed. Please try again.");
         return;
       }
 
@@ -456,7 +575,7 @@
         console.error(err);
         hideLoading();
         inputPanel.classList.remove("hidden");
-        showErrorBanner(err.message || "Claim extraction failed.");
+        showErrorBanner("The simplification could not be completed. Please try again.");
         return;
       }
 
@@ -467,6 +586,16 @@
         simplified_text: simplificationResult.simplified_text,
         claims: claimsResult.claims,
       };
+
+      publishDebugPayload({
+        run_id: simplificationResult._run_id,
+        timestamp: new Date().toISOString(),
+        provision_id: simplificationResult._provision_id,
+        pipeline_status: simplificationResult._pipeline_status,
+        provenance: simplificationResult._provenance,
+        spans: simplificationResult.source_spans,
+        claims: claimsResult.claims,
+      });
 
       // Render
       hideLoading();

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/jpeg" href="icons/favicon.jpeg" />
+  <title>ClearClause Pipeline Debugger</title>
+  <meta name="description" content="Development-only tool showing internal ClearClause pipeline stage execution. Not part of the normal application." />
+
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Consolas', 'monospace'],
+          },
+        },
+      },
+    };
+  </script>
+</head>
+
+<body class="bg-slate-950 text-slate-200 font-sans antialiased min-h-screen">
+
+  <main class="max-w-5xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- Header -->
+    <header class="flex flex-wrap items-start justify-between gap-4 mb-6 pb-4 border-b border-slate-800">
+      <div>
+        <h1 class="text-xl font-bold text-slate-100">ClearClause Pipeline Debugger</h1>
+        <p class="mt-1 text-xs text-slate-500 max-w-2xl">
+          Development tool only — not part of the normal ClearClause interface. Updates live while this
+          tab and the main app are open together; otherwise shows the most recent saved run.
+        </p>
+      </div>
+      <div class="flex items-center gap-3 shrink-0">
+        <span id="connection-indicator" class="text-xs text-slate-500">Waiting for a run…</span>
+        <button id="clear-debug-btn"
+                class="px-3 py-1.5 rounded border border-slate-700 text-xs text-slate-300 hover:bg-slate-800 transition-colors">
+          Clear Debug Data
+        </button>
+      </div>
+    </header>
+
+    <!-- Empty state -->
+    <div id="empty-state" class="text-sm text-slate-500 py-12 text-center">
+      No runs recorded yet. Use ClearClause in another tab — this page updates automatically as soon as a
+      <code class="text-slate-400">/pipeline</code> call completes.
+    </div>
+
+    <!-- Run content (hidden until a run exists) -->
+    <div id="run-content" class="hidden space-y-6">
+
+      <!-- Run summary -->
+      <section class="bg-slate-900 border border-slate-800 rounded-lg p-4">
+        <div class="flex flex-wrap items-center gap-3 mb-2">
+          <span id="run-overall-badge" class="px-2 py-0.5 rounded text-xs font-semibold uppercase"></span>
+          <span class="text-sm text-slate-300">Run <span id="run-id" class="text-slate-100"></span></span>
+        </div>
+        <dl class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs text-slate-400">
+          <div><dt class="text-slate-500">Timestamp</dt><dd id="run-timestamp" class="text-slate-200 mt-0.5"></dd></div>
+          <div><dt class="text-slate-500">Provision ID</dt><dd id="run-provision-id" class="text-slate-200 mt-0.5"></dd></div>
+          <div><dt class="text-slate-500">Simplification model</dt><dd id="run-simplification-model" class="text-slate-200 mt-0.5"></dd></div>
+          <div><dt class="text-slate-500">NLI model</dt><dd id="run-nli-model" class="text-slate-200 mt-0.5"></dd></div>
+        </dl>
+        <p id="run-error-message" class="mt-2 text-xs text-rose-400 hidden"></p>
+      </section>
+
+      <!-- Stage grid -->
+      <section>
+        <h2 class="text-sm font-semibold text-slate-300 mb-2">Pipeline Stages</h2>
+        <div id="stage-grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+      </section>
+
+      <!-- Claims table -->
+      <section>
+        <h2 class="text-sm font-semibold text-slate-300 mb-2">Claims</h2>
+        <div class="overflow-x-auto border border-slate-800 rounded-lg">
+          <table class="w-full text-xs">
+            <thead class="bg-slate-900 text-slate-400">
+              <tr>
+                <th class="text-left px-3 py-2">Claim</th>
+                <th class="text-left px-3 py-2">Evidence span</th>
+                <th class="text-left px-3 py-2">Evidence method</th>
+                <th class="text-left px-3 py-2">Ambiguous</th>
+                <th class="text-left px-3 py-2">Label</th>
+                <th class="text-left px-3 py-2">Confidence</th>
+                <th class="text-left px-3 py-2">P(entail/contr/neutral)</th>
+                <th class="text-left px-3 py-2">Reason</th>
+                <th class="text-left px-3 py-2">Warnings</th>
+              </tr>
+            </thead>
+            <tbody id="claims-tbody" class="divide-y divide-slate-800"></tbody>
+          </table>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <script src="js/debug.js?v=1"></script>
+</body>
+</html>

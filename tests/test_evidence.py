@@ -157,14 +157,34 @@ def test_number_mismatch_does_not_discard_topical_span():
     assert linked[0]["evidence_score"] > 0
 
 
-def test_equal_scores_retain_first_span():
+def test_equal_scores_without_source_text_yield_no_evidence_and_ambiguity_flag():
+    # An exact, deterministically unresolved tie is no longer silently
+    # resolved by "first span wins" — that's an arbitrary choice the NLI
+    # model would then be asked to verify against. Without a source_text
+    # to fall back on, the claim simply gets no evidence.
     claims = [{"claim_id": "C1", "claim_text": "the officer shall report the matter"}]
     spans = [
         _span("P1", "the officer shall report the matter today"),
         _span("P2", "the officer shall report the matter tomorrow"),
     ]
     linked = evidence.link_claims_to_spans(claims, spans)
-    assert linked[0]["evidence_span_id"] == "P1"
+    assert linked[0]["evidence_span_id"] is None
+    assert linked[0]["evidence_text"] is None
+    assert linked[0]["evidence_ambiguity"] is True
+
+
+def test_equal_scores_with_source_text_use_full_provision_ambiguity_fallback():
+    claims = [{"claim_id": "C1", "claim_text": "the officer shall report the matter"}]
+    spans = [
+        _span("P1", "the officer shall report the matter today"),
+        _span("P2", "the officer shall report the matter tomorrow"),
+    ]
+    source_text = "the officer shall report the matter today. the officer shall report the matter tomorrow."
+    linked = evidence.link_claims_to_spans(claims, spans, source_text=source_text)
+    assert linked[0]["evidence_span_id"] is None
+    assert linked[0]["evidence_text"] == source_text
+    assert linked[0]["evidence_method"] == "full_provision_ambiguity_fallback"
+    assert linked[0]["evidence_ambiguity"] is True
 
 
 def test_no_number_claim_gets_no_artificial_number_bonus():
@@ -174,9 +194,23 @@ def test_no_number_claim_gets_no_artificial_number_bonus():
         _span("P2", "the officer shall report the matter clearly on 5 occasions"),
     ]
     linked = evidence.link_claims_to_spans(claims, spans)
-    # Both spans tie on raw overlap; P2 must not win purely because it
-    # happens to contain a number the claim never mentioned.
-    assert linked[0]["evidence_span_id"] == "P1"
+    # Both spans must genuinely tie on raw overlap — P2 must not win
+    # outright purely because it happens to contain a number the claim
+    # never mentioned. A real tie is now reported as unresolved ambiguity,
+    # not silently awarded to either span.
+    assert linked[0]["evidence_ambiguity"] is True
+    assert linked[0]["evidence_span_id"] is None
+
+
+def test_no_match_with_source_text_uses_full_provision_fallback():
+    claims = [{"claim_id": "C1", "claim_text": "the weather today is sunny"}]
+    spans = [_span("P1", "the officer shall report the matter")]
+    source_text = "the officer shall report the matter"
+    linked = evidence.link_claims_to_spans(claims, spans, source_text=source_text)
+    assert linked[0]["evidence_span_id"] is None
+    assert linked[0]["evidence_text"] == source_text
+    assert linked[0]["evidence_method"] == "full_provision"
+    assert linked[0]["evidence_ambiguity"] is False
 
 
 def test_empty_claims_list_is_handled_safely():
