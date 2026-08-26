@@ -7,12 +7,19 @@ outputs/runs/
 *.env
 !backend/.env.example
 
-# Claude Code project instructions (local only)
+# AI-assistant/dev-process notes (local only, not part of the deployable app)
 CLAUDE.md
+AGENTS.md
+HANDOFF.md
+verification_archive/
+
+# Non-app thesis artefact that ended up in this folder
+FYP Midpoint Report.pdf
 
 # Python
 __pycache__/
 *.pyc
+.pytest_cache/
 
 # Editors
 .vscode/

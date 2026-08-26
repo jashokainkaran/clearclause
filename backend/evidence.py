@@ -14,6 +14,24 @@ STOPWORDS = {
     "they", "who", "which", "been", "have", "has", "from", "its", "their"
 }
 
+# How many points a matching DISTINGUISHING token — a NUMBER (digit or
+# word-number) or the word "not" — is worth in link_claims_to_spans'
+# ranking, versus 1 point for an ordinary matching word. Chosen as the
+# smallest whole-number weight that flips the real, documented
+# sibling-branch failure (P1 "5 shared words" vs P2 "3 shared words + the
+# branch-distinguishing number") with a safety margin, while staying a
+# plain int so exact-tie detection is never affected by floating-point
+# rounding. See link_claims_to_spans for the full rationale.
+#
+# "not" is included here as a plain word already present in the token set
+# (STOPWORDS above deliberately keeps it) — this does NOT touch
+# _extract_modality_tags/_MODAL_PROHIBITION_PATTERN or the
+# clear_modal_conflict warning that depends on it, which stay exactly as
+# narrow as before. This only changes how much a shared "not" counts
+# toward picking which span a claim belongs to.
+DISTINGUISHING_WORDS = frozenset({"not"})
+DISTINGUISHING_MATCH_WEIGHT = 4
+
 # Canonical modality tokens — added alongside the original words so
 # semantically-equivalent modal phrasing (e.g. "shall" vs "must") still
 # overlaps even when the surface word differs.
@@ -75,13 +93,107 @@ def _canonical_number(raw: str) -> str:
     return format(Decimal(cleaned).normalize(), "f")
 
 
+# Word-form cardinal and ordinal numbers, recognised in ADDITION to digit
+# numbers (_NUMBER_PATTERN above), so a branch distinguished only by a
+# spelled-out number ("six months" vs "one year", "first offence" vs
+# "second offence") gets the same numeric weighting/tie-break treatment as
+# one distinguished by digits. See link_claims_to_spans for why this
+# matters: a claim that repeats a shared head's subject/verb can otherwise
+# outscore the one branch-specific number that actually distinguishes it
+# (documented live failure: outputs/runs/run_20260722_091308_55c782.json,
+# verification_archive/semantic_evidence_resolver_report.md).
+#
+# Deliberately narrow:
+#   - "one" is EXCLUDED from standalone recognition. Unlike the other
+#     cardinals, "one" is heavily overloaded in ordinary English as an
+#     indefinite pronoun ("one of the offences", "each one") rather than a
+#     count, and treating every occurrence as the number 1 produces false
+#     numeric agreement between unrelated spans that happen to both use
+#     "one" this way — caught by hand against
+#     tests/pipeline_tests/test_evidence_units.py's nested_enum fixture,
+#     where "Theft is one of the offences listed" is not about subsection
+#     "(1)". "one" is still recognised inside an unambiguous hyphenated
+#     compound ("twenty-one").
+#   - No "hundred"/"thousand" multiplier and no multi-word compounding
+#     ("one hundred and five"). Amounts that large are written as digits
+#     in real statutes far more often than spelled out; the durations and
+#     counts that actually distinguish branches ("six months", "first
+#     offence") stay in scope.
+_TENS_WORD_VALUES = {
+    "twenty": 20, "thirty": 30, "forty": 40, "fifty": 50,
+    "sixty": 60, "seventy": 70, "eighty": 80, "ninety": 90,
+}
+_ONES_WORD_VALUES = {
+    "one": 1, "two": 2, "three": 3, "four": 4, "five": 5,
+    "six": 6, "seven": 7, "eight": 8, "nine": 9,
+}
+_TEEN_WORD_VALUES = {
+    "zero": 0, "ten": 10, "eleven": 11, "twelve": 12, "thirteen": 13,
+    "fourteen": 14, "fifteen": 15, "sixteen": 16, "seventeen": 17,
+    "eighteen": 18, "nineteen": 19,
+}
+_ORDINAL_WORD_VALUES = {
+    "first": 1, "second": 2, "third": 3, "fourth": 4, "fifth": 5,
+    "sixth": 6, "seventh": 7, "eighth": 8, "ninth": 9, "tenth": 10,
+    "eleventh": 11, "twelfth": 12, "thirteenth": 13, "fourteenth": 14,
+    "fifteenth": 15, "sixteenth": 16, "seventeenth": 17, "eighteenth": 18,
+    "nineteenth": 19, "twentieth": 20,
+}
+_STANDALONE_CARDINAL_VALUES = {
+    **_TENS_WORD_VALUES,
+    **_TEEN_WORD_VALUES,
+    **{word: value for word, value in _ONES_WORD_VALUES.items() if word != "one"},
+}
+
+_TENS_ALTERNATION = '|'.join(_TENS_WORD_VALUES)
+_ONES_ALTERNATION = '|'.join(_ONES_WORD_VALUES)
+_STANDALONE_CARDINAL_ALTERNATION = '|'.join(_STANDALONE_CARDINAL_VALUES)
+_ORDINAL_ALTERNATION = '|'.join(_ORDINAL_WORD_VALUES)
+
+_WORD_NUMBER_PATTERN = re.compile(
+    r'\b(?:'
+    rf'(?:{_TENS_ALTERNATION})-(?:{_ONES_ALTERNATION})'
+    rf'|{_STANDALONE_CARDINAL_ALTERNATION}'
+    rf'|{_ORDINAL_ALTERNATION}'
+    r')\b',
+    re.IGNORECASE,
+)
+
+
+def _word_number_value(word: str) -> Optional[int]:
+    """
+    Canonical integer value of a word matched by _WORD_NUMBER_PATTERN, or
+    None if it isn't one (defensive — the pattern should only ever match a
+    recognised word). A hyphenated tens-ones compound ("twenty-one") sums
+    its two parts, including "one" as the ones-part — unlike bare "one",
+    a compound like this is unambiguously numeric.
+    """
+    w = word.lower()
+    if "-" in w:
+        tens_part, _, ones_part = w.partition("-")
+        tens_val = _TENS_WORD_VALUES.get(tens_part)
+        ones_val = _ONES_WORD_VALUES.get(ones_part)
+        if tens_val is not None and ones_val is not None:
+            return tens_val + ones_val
+        return None
+    return _STANDALONE_CARDINAL_VALUES.get(w, _ORDINAL_WORD_VALUES.get(w))
+
+
 def extract_numbers(text: str) -> set[str]:
     """
-    Extracts every standalone legal numeric value in text, canonicalised.
-    Used for number-aware tie-breaking and diagnostics — kept separate from
-    the general lexical tokenizer (see _tokenize).
+    Extracts every standalone legal numeric value in text, canonicalised —
+    both digit numbers (_NUMBER_PATTERN) and recognised word-numbers
+    (_WORD_NUMBER_PATTERN, e.g. "six" -> "6"). Used for number-aware
+    tie-breaking, ranking weight, and diagnostics — kept separate from the
+    general lexical tokenizer (see _tokenize).
     """
-    return {_canonical_number(m) for m in _NUMBER_PATTERN.findall(text)}
+    digit_numbers = {_canonical_number(m) for m in _NUMBER_PATTERN.findall(text)}
+    word_numbers = set()
+    for m in _WORD_NUMBER_PATTERN.finditer(text):
+        value = _word_number_value(m.group(0))
+        if value is not None:
+            word_numbers.add(str(value))
+    return digit_numbers | word_numbers
 
 
 def extract_modality_tags(text: str) -> set[str]:
@@ -216,6 +328,15 @@ def _tokenize_parts(text: str) -> tuple[set[str], set[str]]:
 
     masked_text = _NUMBER_PATTERN.sub(_mask_number, text_lower)
 
+    def _mask_word_number(m: "re.Match[str]") -> str:
+        value = _word_number_value(m.group(0))
+        if value is None:
+            return m.group(0)
+        numbers.add(str(value))
+        return " "
+
+    masked_text = _WORD_NUMBER_PATTERN.sub(_mask_word_number, masked_text)
+
     lexical: set[str] = set()
     lexical |= _extract_modality_tags(text_lower)
 
@@ -333,10 +454,25 @@ def link_claims_to_spans(
     For each claim, select the best SEMANTIC EVIDENCE UNIT (see
     resolve_evidence_units) and record what the NLI model should verify.
 
-    Selection scores the claim against each unit's OWN-span tokens
-    (evidence_score = len(claim_lexical & span_own_lexical)). Ranking key,
-    highest wins:
-      1. Raw lexical-overlap count (this is evidence_score)
+    Selection scores the claim against each unit's OWN-span tokens. A
+    matching NUMBER (digit or recognised word-number — see
+    _WORD_NUMBER_PATTERN) counts for DISTINGUISHING_MATCH_WEIGHT points instead of
+    1, so it can outrank a shared-vocabulary lead from ordinary words.
+    This is not a cosmetic tie-break: two sibling punishment branches
+    routinely share their subject and verb ("the person ... must be
+    punished") because a claim restates the head, and under a flat word
+    count that shared vocabulary can outscore the one or two words that
+    actually distinguish the branches ("six months" vs "one year",
+    "first offence" vs "second offence") — a real, documented failure
+    (outputs/runs/run_20260722_091308_55c782.json; see
+    verification_archive/semantic_evidence_resolver_report.md for the
+    full diagnosis). evidence_score below IS this weighted total, not a
+    plain word count, so what's shown to a caller is exactly what decided
+    the winner.
+
+    Ranking key, highest wins:
+      1. Weighted score (generic lexical matches x1 + number matches x
+         DISTINGUISHING_MATCH_WEIGHT) — this is evidence_score
       2. Whether the span contains all of the claim's normalised numbers
       3. Count of matching normalised numbers
       4. Prefer the more specific unit (a joined head+item) over a bare head
@@ -358,7 +494,11 @@ def link_claims_to_spans(
                             otherwise [selected]. This is what the NLI model
                             receives.
       - evidence_text     : the unit premise — exactly the text sent to DeBERTa
-      - evidence_score    : integer lexical overlap against the OWN span
+      - evidence_score    : integer weighted overlap against the OWN span
+                            (generic lexical matches x1 + number matches x
+                            DISTINGUISHING_MATCH_WEIGHT) — always a whole number,
+                            never a fraction, so the exact-tie check below
+                            stays exact
       - evidence_method   : "lexical_overlap" | "full_provision" |
                             "full_provision_ambiguity_fallback" | None
       - evidence_ambiguity: True only when an exact tie was detected
@@ -375,14 +515,22 @@ def link_claims_to_spans(
         tie_detected = False
 
         for unit in units:
-            score = len(claim_words & unit["own_lex"])
+            all_word_matches = claim_words & unit["own_lex"]
+            distinguishing_word_matches = all_word_matches & DISTINGUISHING_WORDS
+            generic_matches = all_word_matches - DISTINGUISHING_WORDS
+            number_matches = claim_numbers & unit["own_num"]
+            score = (
+                len(generic_matches)
+                + len(number_matches) * DISTINGUISHING_MATCH_WEIGHT
+                + len(distinguishing_word_matches) * DISTINGUISHING_MATCH_WEIGHT
+            )
             if score == 0:
                 continue
 
             candidate_key = (
                 score,
                 claim_numbers.issubset(unit["own_num"]),
-                len(claim_numbers & unit["own_num"]),
+                len(number_matches),
                 len(unit["ids"]) > 1,
             )
 

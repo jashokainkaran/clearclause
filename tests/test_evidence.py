@@ -141,12 +141,22 @@ def test_number_agreement_used_only_when_lexical_overlap_tied():
 
 def test_numbers_are_not_counted_twice_in_the_raw_score():
     # Regression for evidence-retrieval-number-audit.md: a shared number must
-    # not inflate evidence_score. Claim and span share exactly one lexical
-    # token ("penalty") plus the number 18 — the score must be 1, not 2.
+    # contribute to evidence_score exactly ONCE, not twice (once as a plain
+    # lexical token, once again in the numeric tie-break tiers). Claim and
+    # span share one lexical token ("penalty") plus the number 18.
+    #
+    # Numbers are now deliberately weighted (DISTINGUISHING_MATCH_WEIGHT) rather than
+    # excluded from the score entirely -- see link_claims_to_spans and
+    # verification_archive/semantic_evidence_resolver_report.md for why a
+    # flat, number-blind score let a shared-vocabulary lead beat the one
+    # number that actually distinguishes two sibling branches. So the
+    # expected value here is 1 generic match + 1 number match x
+    # DISTINGUISHING_MATCH_WEIGHT, not the old flat "1" -- what stays true, and what
+    # this test still checks, is that "18" is counted exactly once.
     claims = [{"claim_id": "C1", "claim_text": "the penalty is 18"}]
     spans = [_span("P1", "the penalty was 18")]
     linked = evidence.link_claims_to_spans(claims, spans)
-    assert linked[0]["evidence_score"] == 1
+    assert linked[0]["evidence_score"] == 1 + evidence.DISTINGUISHING_MATCH_WEIGHT
 
 
 def test_number_mismatch_does_not_discard_topical_span():
@@ -215,6 +225,119 @@ def test_no_match_with_source_text_uses_full_provision_fallback():
 
 def test_empty_claims_list_is_handled_safely():
     assert evidence.link_claims_to_spans([], [_span("P1", "some text")]) == []
+
+
+# ---------------------------------------------------------------------------
+# Word-number recognition (E) — _word_number_value / _WORD_NUMBER_PATTERN,
+# added alongside the DISTINGUISHING_MATCH_WEIGHT fix. See
+# verification_archive/semantic_evidence_resolver_report.md and
+# HANDOFF.md's "Evidence-linking: distinguishing-token weighting".
+# ---------------------------------------------------------------------------
+
+@pytest.mark.parametrize("word,expected", [
+    ("six", 6),
+    ("twelve", 12),
+    ("thirteen", 13),
+    ("twenty", 20),
+    ("forty", 40),
+    ("ninety", 90),
+    ("zero", 0),
+])
+def test_word_number_value_recognises_cardinals(word, expected):
+    assert evidence._word_number_value(word) == expected
+
+
+@pytest.mark.parametrize("word,expected", [
+    ("first", 1),
+    ("second", 2),
+    ("third", 3),
+    ("tenth", 10),
+    ("twentieth", 20),
+])
+def test_word_number_value_recognises_ordinals(word, expected):
+    assert evidence._word_number_value(word) == expected
+
+
+@pytest.mark.parametrize("word,expected", [
+    ("twenty-one", 21),
+    ("twenty-five", 25),
+    ("forty-two", 42),
+    ("ninety-nine", 99),
+])
+def test_word_number_value_recognises_hyphenated_compounds(word, expected):
+    assert evidence._word_number_value(word) == expected
+
+
+def test_word_number_value_excludes_bare_one():
+    # Deliberate exclusion: "one" is overloaded as an indefinite pronoun
+    # ("one of the offences") far more often than a genuine count in this
+    # domain. Recognising it as a number caused a false numeric-agreement
+    # collision against an unrelated subsection marker "(1)" — see
+    # tests/pipeline_tests/test_evidence_units.py's nested_enum fixture.
+    assert evidence._word_number_value("one") is None
+
+
+def test_word_number_value_still_recognises_one_inside_a_compound():
+    # "twenty-one" is unambiguously numeric even though bare "one" is not.
+    assert evidence._word_number_value("twenty-one") == 21
+
+
+def test_word_number_value_returns_none_for_unrecognised_words():
+    assert evidence._word_number_value("cat") is None
+    assert evidence._word_number_value("hundred") is None  # deliberately out of scope
+
+
+def test_extract_numbers_includes_word_numbers_alongside_digits():
+    result = evidence.extract_numbers(
+        "six months, one year, twenty-five days, the first offence, or 6 units"
+    )
+    # "six" -> 6 (same canonical value as digit "6"), "twenty-five" -> 25,
+    # "first" -> 1. "one" contributes nothing (excluded).
+    assert result == {"1", "6", "25"}
+
+
+def test_tokenize_parts_masks_word_numbers_out_of_the_lexical_set():
+    lexical, numbers = evidence._tokenize_parts("extend to six months")
+    assert "six" not in lexical
+    assert numbers == {"6"}
+    assert lexical == {"extend", "months"}
+
+
+# ---------------------------------------------------------------------------
+# Distinguishing-token weighting ambiguity (F) — confirms the new weighted
+# score (numbers/"not" at DISTINGUISHING_MATCH_WEIGHT, everything else at 1)
+# still produces an exact, safely-detected tie rather than an arbitrary
+# pick, and that the weighting stays in exact integer arithmetic (no
+# floating-point near-misses breaking the tie check).
+# ---------------------------------------------------------------------------
+
+def test_weighted_tie_on_shared_number_is_still_reported_as_ambiguous():
+    # Both spans share the same 2 generic words ("penalty", "months") and
+    # the same distinguishing number ("six"/"6") with the claim — an exact
+    # tie under the new weighted score (2 + 1*DISTINGUISHING_MATCH_WEIGHT
+    # for each), not just under the old flat count.
+    claims = [{"claim_id": "C1", "claim_text": "the penalty is six months exactly"}]
+    spans = [
+        _span("P1", "the penalty was six months precisely"),
+        _span("P2", "the sentence penalty is six months broadly"),
+    ]
+    linked = evidence.link_claims_to_spans(claims, spans)
+    assert linked[0]["evidence_ambiguity"] is True
+    assert linked[0]["evidence_span_id"] is None
+
+
+def test_distinguishing_number_breaks_a_tie_that_would_otherwise_be_ambiguous():
+    # Same setup as above, but P2's number now disagrees with the claim.
+    # The shared distinguishing number must let P1 win outright instead of
+    # falling into the ambiguity fallback.
+    claims = [{"claim_id": "C1", "claim_text": "the penalty is six months exactly"}]
+    spans = [
+        _span("P1", "the penalty was six months precisely"),
+        _span("P2", "the sentence penalty is twelve months broadly"),
+    ]
+    linked = evidence.link_claims_to_spans(claims, spans)
+    assert linked[0]["evidence_ambiguity"] is False
+    assert linked[0]["evidence_span_id"] == "P1"
 
 
 def test_empty_span_list_is_handled_safely():

@@ -57,7 +57,7 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background-color: #3b82f6;          /* blue-500 */
+  background-color: #4f46e5;          /* indigo-600 */
   animation: pulse-dot 1.2s ease-in-out infinite;
 }
 
@@ -72,8 +72,8 @@
 /* --- Textarea focus ring improvement ------------------------------------ */
 textarea:focus {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);   /* blue-500 @ 25% */
-  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.25);   /* indigo-600 @ 25% */
+  border-color: #4f46e5;
   transition: box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
@@ -88,15 +88,36 @@ textarea:focus {
 }
 .btn-lift:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 6px 16px rgba(67, 56, 202, 0.18);   /* tinted toward indigo-700, not flat black */
 }
 .btn-lift:active {
   transform: translateY(0);
 }
 
-/* --- Blue left-border accent card --------------------------------------- */
+/* --- Indigo left-border accent card -------------------------------------- */
 .accent-card-blue {
-  border-left: 4px solid #3b82f6;     /* blue-500 */
+  border-left: 4px solid #4f46e5;     /* indigo-600 */
+}
+
+/* --- Skip-to-content link (accessibility) -------------------------------- */
+/* Visually hidden until keyboard-focused, so keyboard users can bypass the
+   navbar/disclaimer without a mouse. */
+.skip-link {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: translateY(-150%);
+  z-index: 50;
+  background: #1e1b4b;
+  color: #fff;
+  padding: 0.6rem 1rem;
+  border-radius: 0 0 0.5rem 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: transform 0.15s ease;
+}
+.skip-link:focus {
+  transform: translateY(0);
 }
 
 /* --- Monospace span text ------------------------------------------------ */

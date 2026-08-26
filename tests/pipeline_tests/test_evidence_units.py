@@ -132,6 +132,26 @@ FIXTURES = {
         ("C1", "Every application must be made within thirty days.", ["P1"]),
         ("C2", "The Court may extend the period where good cause is shown.", ["P2"]),
     ]),
+    # Real claim wording from an actual live pipeline run
+    # (outputs/runs/run_20260722_091308_55c782.json), not hand-written.
+    # This is the exact regression the "rioting" fixture above did NOT
+    # catch: the real LLM's claims repeat the head's subject/verb ("the
+    # person ... must be punished"), which a flat word count let outweigh
+    # the branch-specific "six months"/"not". Before the
+    # DISTINGUISHING_MATCH_WEIGHT fix, C5/C6/C7 all resolved to ["P1"]
+    # instead of ["P1", "P2"] and showed red/unsupported. See
+    # verification_archive/semantic_evidence_resolver_report.md and
+    # HANDOFF.md's "Evidence-linking: distinguishing-token weighting".
+    "rioting_real_llm_wording": (RIOTING, 2, [
+        ("C1", "If someone acts maliciously or wantonly and does something illegal, intending or knowing that this action might cause a riot, they are responsible if a riot actually happens.", ["P1"]),
+        ("C2", "If a riot occurs because of their provocation, they must be punished with imprisonment for up to one year.", ["P1"]),
+        ("C3", "If a riot occurs because of their provocation, they must be punished with a fine.", ["P1"]),
+        ("C4", "If a riot occurs because of their provocation, they must be punished with both imprisonment for up to one year and a fine.", ["P1"]),
+        ("C5", "If the person's provocation does not lead to a riot, they must be punished with imprisonment for up to six months.", ["P1", "P2"]),
+        ("C6", "If the person's provocation does not lead to a riot, they must be punished with a fine.", ["P1", "P2"]),
+        ("C7", "If the person's provocation does not lead to a riot, they must be punished with both imprisonment for up to six months and a fine.", ["P1", "P2"]),
+        ("C9", "The person's actions must be illegal and intended to cause a riot.", ["P1"]),
+    ]),
 }
 
 
@@ -245,6 +265,27 @@ def test_numeric_markers_stay_standalone_when_not_a_list_head():
     ids = _ids_by_claim("structural_markers")
     assert ids["C1"] == ["P1"]
     assert ids["C2"] == ["P2"]
+
+
+def test_real_llm_rioting_wording_no_riot_claims_use_p1_p2():
+    # The actual documented failure, locked in with real (not hand-written)
+    # claim wording: before the DISTINGUISHING_MATCH_WEIGHT fix, these three
+    # resolved to ["P1"] and showed red/unsupported against the wrong branch.
+    ids = _ids_by_claim("rioting_real_llm_wording")
+    assert ids["C5"] == ["P1", "P2"]
+    assert ids["C6"] == ["P1", "P2"]
+    assert ids["C7"] == ["P1", "P2"]
+
+
+def test_real_llm_rioting_wording_committed_claims_stay_on_p1():
+    # The fix must not overcorrect: claims genuinely about the "riot
+    # committed" branch must stay on P1 alone.
+    ids = _ids_by_claim("rioting_real_llm_wording")
+    assert ids["C1"] == ["P1"]
+    assert ids["C2"] == ["P1"]
+    assert ids["C3"] == ["P1"]
+    assert ids["C4"] == ["P1"]
+    assert ids["C9"] == ["P1"]
 
 
 # --------------------------------------------------------------------------- #

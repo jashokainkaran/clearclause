@@ -24,19 +24,24 @@
               'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue',
               'Arial', 'Noto Sans', 'sans-serif'
             ],
+            serif: [
+              'Fraunces', 'ui-serif', 'Georgia', 'Cambria', 'Times New Roman', 'serif'
+            ],
           },
         },
       },
     };
   </script>
 
-  <!-- Google Font — Inter -->
+  <!-- Google Fonts — Inter (body) + Fraunces (headings) -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&display=swap" rel="stylesheet" />
 </head>
 
-<body class="bg-slate-50 text-slate-700 font-sans antialiased min-h-screen flex flex-col">
+<body class="bg-stone-50 text-stone-700 font-sans antialiased min-h-screen flex flex-col">
+
+  <a href="#main-content" class="skip-link">Skip to content</a>
 
   <!-- ===== Navbar ===== -->
   <div id="navbar-container"></div>
@@ -45,15 +50,15 @@
   <div id="disclaimer-container" class="max-w-3xl mx-auto w-full px-4 sm:px-6 lg:px-8 mt-3"></div>
 
   <!-- ===== Main Content ===== -->
-  <main class="flex-1 max-w-3xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-10 md:py-14">
+  <main id="main-content" class="flex-1 max-w-3xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-10 md:py-14">
 
     <!-- Page heading -->
     <div class="fade-in-up text-center mb-8">
-      <h1 class="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
-        Simplify a Sri Lankan Statute Provision
+      <h1 class="font-serif text-3xl sm:text-4xl font-semibold text-stone-900 tracking-tight text-balance">
+        Simplify a Sri Lankan statute provision
       </h1>
-      <p class="mt-2 text-sm text-slate-500 max-w-lg mx-auto leading-relaxed">
-        Paste a legal provision below. The input will be processed by the ClearClause backend.
+      <p class="mt-2 text-sm text-stone-500 max-w-lg mx-auto leading-relaxed">
+        Paste a legal provision below and get a plain-English rewrite with every claim linked back to its source.
       </p>
     </div>
 
@@ -63,15 +68,15 @@
     <!-- ===== Input Panel ===== -->
     <div id="input-panel" class="fade-in-up" data-delay="1">
       <form id="simplify-form" novalidate>
-        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-5 sm:p-6">
-          <label for="statute-input" class="block text-sm font-medium text-slate-700 mb-2">
+        <div class="bg-white rounded-xl border border-stone-200 shadow-sm p-5 sm:p-6">
+          <label for="statute-input" class="block text-sm font-medium text-stone-700 mb-2">
             Paste a Sri Lankan statute provision here
           </label>
           <textarea
             id="statute-input"
             name="statute-input"
             rows="6"
-            class="w-full rounded-lg border border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-700 placeholder-slate-400 resize-y transition-colors duration-150 focus:bg-white"
+            class="w-full rounded-lg border border-stone-300 bg-stone-50 px-4 py-3 text-sm text-stone-700 placeholder-stone-400 resize-y transition-colors duration-150 focus:bg-white"
             placeholder="Example: Whoever commits murder shall be punished with death..."
             aria-describedby="validation-msg"
           ></textarea>
@@ -83,9 +88,9 @@
             <button
               id="simplify-btn"
               type="submit"
-              class="btn-lift inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-blue-600 text-white text-sm font-semibold shadow-sm hover:bg-blue-700 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              class="btn-lift inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-indigo-700 text-white text-sm font-semibold shadow-sm hover:bg-indigo-800 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2"
             >
-              <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 0 0-2.455 2.456Z" /></svg>
+              <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 0 0-2.455 2.456Z" /></svg>
               Simplify
             </button>
           </div>
@@ -95,14 +100,14 @@
 
     <!-- ===== Loading Panel ===== -->
     <div id="loading-panel" class="hidden fade-in mt-6">
-      <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-8 text-center">
+      <div class="bg-white rounded-xl border border-stone-200 shadow-sm p-8 text-center">
         <div class="cc-dots mx-auto mb-4">
           <span class="dot"></span>
           <span class="dot"></span>
           <span class="dot"></span>
         </div>
-        <p id="loading-text" class="text-sm font-medium text-slate-700">Simplifying provision…</p>
-        <p class="mt-1 text-xs text-slate-400">Processing via the ClearClause backend.</p>
+        <p id="loading-text" class="text-sm font-medium text-stone-700">Simplifying provision…</p>
+        <p class="mt-1 text-xs text-stone-400">Processing via the ClearClause backend.</p>
       </div>
     </div>
 
@@ -114,7 +119,7 @@
   </main>
 
   <!-- ===== Footer ===== -->
-  <footer class="py-4 text-center text-xs text-slate-400 border-t border-slate-100">
+  <footer class="py-4 text-center text-xs text-stone-400 border-t border-stone-100">
     &copy; 2026 ClearClause
   </footer>
 

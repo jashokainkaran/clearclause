@@ -334,9 +334,9 @@
       const originalSection = document.createElement("section");
       originalSection.className = "card-enter mb-8";
       originalSection.innerHTML = `
-        <h2 class="text-lg font-semibold text-slate-800 mb-3">Original Text</h2>
-        <div class="bg-slate-50 rounded-lg border border-slate-200 p-5">
-          <p class="text-slate-600 leading-relaxed italic">"${escapeHtml(finalResult.source_text)}"</p>
+        <h2 class="text-lg font-semibold text-stone-800 mb-3">Original Text</h2>
+        <div class="bg-stone-50 rounded-lg border border-stone-200 p-5">
+          <p class="text-stone-600 leading-relaxed italic">"${escapeHtml(finalResult.source_text)}"</p>
         </div>
       `;
       resultsPanel.appendChild(originalSection);
@@ -354,15 +354,15 @@
         .filter((para) => para.length > 0)
         .map(
           (para) =>
-            `<p class="text-slate-700 leading-relaxed mb-3 last:mb-0">${escapeHtml(para)}</p>`
+            `<p class="text-stone-700 leading-relaxed mb-3 last:mb-0">${escapeHtml(para)}</p>`
         )
         .join("");
 
       const simplifiedSection = document.createElement("section");
       simplifiedSection.className = "card-enter";
       simplifiedSection.innerHTML = `
-        <h2 class="text-lg font-semibold text-slate-800 mb-3">Simplified Text</h2>
-        <div class="bg-white rounded-lg border border-slate-200 accent-card-blue p-5">
+        <h2 class="text-lg font-semibold text-stone-800 mb-3">Simplified Text</h2>
+        <div class="bg-white rounded-lg border border-stone-200 accent-card-blue p-5">
           ${simplifiedParagraphs}
         </div>
       `;
@@ -371,8 +371,8 @@
       // Section B — Atomic Claims
       const claimsSection = document.createElement("section");
       claimsSection.className = "card-enter mt-8";
-      let claimsHTML = `<h2 class="text-lg font-semibold text-slate-800 mb-3">Atomic Claims</h2>`;
-      claimsHTML += `<p class="text-xs text-slate-500 mb-3 italic">This percentage represents the model's confidence for this individual claim-evidence pair. It is not the model's overall accuracy or a guarantee of legal correctness.</p>`;
+      let claimsHTML = `<h2 class="text-lg font-semibold text-stone-800 mb-3">Atomic Claims</h2>`;
+      claimsHTML += `<p class="text-xs text-stone-500 mb-3 italic">This percentage represents the model's confidence for this individual claim-evidence pair. It is not the model's overall accuracy or a guarantee of legal correctness.</p>`;
       finalResult.claims.forEach((claim, idx) => {
         // Evidence label. When the backend joined a headless continuation
         // branch to its preceding span, evidence_span_ids holds BOTH ids and
@@ -388,7 +388,7 @@
             : claim.evidence_span_id ?? "—";
         const isCombinedEvidence = evidenceIds.length > 1;
 
-        let badgeColorClass = "bg-slate-100 text-slate-800";
+        let badgeColorClass = "bg-stone-100 text-stone-800";
         const labelVal = claim.verification_label ?? "unverified";
         if (labelVal === "supported") {
           badgeColorClass = "bg-green-100 text-green-800";
@@ -411,7 +411,7 @@
         // calibrated probability that the label is correct.
         const hasConfidence = claim.verification_confidence !== null && claim.verification_confidence !== undefined;
         const confidenceLine = hasConfidence
-          ? `<p class="text-xs text-slate-500 mt-2">NLI label confidence: ${(claim.verification_confidence * 100).toFixed(2)}%</p>`
+          ? `<p class="text-xs text-stone-500 mt-2">NLI label confidence: ${(claim.verification_confidence * 100).toFixed(2)}%</p>`
           : "";
 
         // Evidence actually sent to the NLI model. Always rendered when
@@ -419,18 +419,18 @@
         // previous + continuation-branch premise, so the backend can never
         // silently verify against text the user was not shown.
         const evidenceBlock = claim.evidence_text
-          ? `<details class="mt-2 text-xs text-slate-500"${isCombinedEvidence ? " open" : ""}>
-              <summary class="cursor-pointer select-none hover:text-slate-700">${
+          ? `<details class="mt-2 text-xs text-stone-500"${isCombinedEvidence ? " open" : ""}>
+              <summary class="cursor-pointer select-none hover:text-stone-700">${
                 isCombinedEvidence
                   ? `Evidence sent to model (combined ${escapeHtml(spanLabel)})`
                   : "Evidence sent to model"
               }</summary>
               ${
                 isCombinedEvidence
-                  ? `<p class="mt-1 text-slate-400 italic">This branch is headless on its own, so the preceding span was joined to it before verification.</p>`
+                  ? `<p class="mt-1 text-stone-400 italic">This branch is headless on its own, so the preceding span was joined to it before verification.</p>`
                   : ""
               }
-              <p class="mono-span mt-1 text-slate-600 bg-slate-50 rounded p-2">${escapeHtml(claim.evidence_text)}</p>
+              <p class="mono-span mt-1 text-stone-600 bg-stone-50 rounded p-2">${escapeHtml(claim.evidence_text)}</p>
             </details>`
           : "";
 
@@ -439,8 +439,8 @@
         // (missing the field entirely) don't break rendering.
         const probs = claim.nli_probabilities;
         const modelDetails = probs
-          ? `<details class="mt-2 text-xs text-slate-500">
-              <summary class="cursor-pointer select-none hover:text-slate-700">Model details</summary>
+          ? `<details class="mt-2 text-xs text-stone-500">
+              <summary class="cursor-pointer select-none hover:text-stone-700">Model details</summary>
               <ul class="mt-1 ml-4 list-disc">
                 <li>Entailment: ${((probs.entailment ?? 0) * 100).toFixed(2)}%</li>
                 <li>Contradiction: ${((probs.contradiction ?? 0) * 100).toFixed(2)}%</li>
@@ -450,13 +450,13 @@
           : "";
 
         claimsHTML += `
-          <div class="bg-white rounded-lg border border-slate-200 p-4 mb-3 fade-in-up" data-delay="${idx + 1}">
+          <div class="bg-white rounded-lg border border-stone-200 p-4 mb-3 fade-in-up" data-delay="${idx + 1}">
             <div class="flex flex-wrap items-start gap-2 mb-1.5">
               <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-emerald-100 text-emerald-800">${escapeHtml(claim.claim_id)}</span>
               <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-purple-100 text-purple-800">${escapeHtml(spanLabel)}</span>
               ${labelBadge}
             </div>
-            <p class="text-slate-700 text-sm leading-relaxed">${escapeHtml(claim.claim_text)}</p>
+            <p class="text-stone-700 text-sm leading-relaxed">${escapeHtml(claim.claim_text)}</p>
             ${confidenceLine}
             ${evidenceBlock}
             ${modelDetails}
@@ -466,7 +466,7 @@
 
       const hasVerification = finalResult.claims.some(c => c.verification_label !== undefined && c.verification_label !== null);
       if (!hasVerification) {
-        claimsHTML += `<p class="text-xs text-slate-400 mt-2 italic">NLI verification coming soon</p>`;
+        claimsHTML += `<p class="text-xs text-stone-400 mt-2 italic">NLI verification coming soon</p>`;
       }
 
       claimsSection.innerHTML = claimsHTML;
@@ -476,15 +476,15 @@
       // Section C — Source Spans
       const spansSection = document.createElement("section");
       spansSection.className = "card-enter mt-8";
-      let spansHTML = `<h2 class="text-lg font-semibold text-slate-800 mb-3">Source Spans</h2>`;
+      let spansHTML = `<h2 class="text-lg font-semibold text-stone-800 mb-3">Source Spans</h2>`;
       finalResult.source_spans.forEach((span, idx) => {
         spansHTML += `
-          <div class="bg-white rounded-lg border border-slate-200 p-4 mb-3 fade-in-up" data-delay="${idx + 1}">
+          <div class="bg-white rounded-lg border border-stone-200 p-4 mb-3 fade-in-up" data-delay="${idx + 1}">
             <div class="flex flex-wrap items-center gap-2 mb-1.5">
               <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-purple-100 text-purple-800">${escapeHtml(span.span_id)}</span>
-              <span class="text-xs text-slate-400">chars ${span.start}–${span.end}</span>
+              <span class="text-xs text-stone-400">chars ${span.start}–${span.end}</span>
             </div>
-            <p class="mono-span text-slate-600 bg-slate-50 rounded p-3">${escapeHtml(span.text)}</p>
+            <p class="mono-span text-stone-600 bg-stone-50 rounded p-3">${escapeHtml(span.text)}</p>
           </div>
         `;
       });
@@ -496,7 +496,7 @@
       resetWrap.className = "mt-8 text-center card-enter";
       resetWrap.innerHTML = `
         <button id="reset-btn"
-                class="btn-lift inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-slate-300 text-slate-600 text-sm font-medium bg-white hover:bg-slate-50 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                class="btn-lift inline-flex items-center gap-2 px-5 py-2.5 rounded-lg border border-stone-300 text-stone-600 text-sm font-medium bg-white hover:bg-stone-50 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2">
           <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182" /></svg>
           Clear / Try another
         </button>
