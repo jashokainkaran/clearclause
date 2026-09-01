@@ -37,7 +37,7 @@
 - Actually used: cross-encoder/nli-deberta-v3-small — an NLI-specific
   fine-tune of the same base model, not the bare microsoft checkpoint —
   evaluated zero-shot against 4 other candidate NLI checkpoints (see
-  nli_baseline_testing_and_finetuning/README.md's "Multi-model
+  nli_finetuning/README.md's "Multi-model
   comparison"), then fine-tuned further on ClearClause's own statutory
   data (see the same file's "DeBERTa Fine-Tuning Experiment"). The
   fine-tuned checkpoint (finetuning/finetuned_deberta/) is what the app

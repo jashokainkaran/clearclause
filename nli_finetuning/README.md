@@ -405,6 +405,10 @@ Each writes the same per-set `predictions.csv` / `report.txt` /
 results coexist and are independently comparable. These are the scripts to
 run for a fair generalisation estimate; the validation numbers in the
 "Fine-Tuning Experiment" sections below are not a substitute for any of them.
+(The copies checked into this repo have had the `run_<timestamp>/` wrapper
+flattened away — each `<model-folder-name>/` now sits directly under
+`outputs/` — purely to keep path lengths short; a fresh run of these scripts
+still produces the nested `run_<timestamp>/` form described above.)
 
 # DeBERTa Fine-Tuning Experiment (nli-deberta-v3-small)
 

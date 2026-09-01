@@ -18,7 +18,7 @@ __pycache__/
 # Editors
 .vscode/
 
-# Research/ML subtrees (data_processing, model_lab, nli_baseline_testing_and_finetuning):
+# Research/ML subtrees (data_processing, model_lab, nli_finetuning):
 # keep code + small result summaries only. Never re-add local venvs, raw
 # statute PDFs/datasets, per-row text-bearing CSVs, or checkpoint weights
 # here even if they exist in the original working folders outside app/.
@@ -33,9 +33,9 @@ model_lab/checkpoints/
 model_lab/notebooks/output/
 model_lab/notebooks/*/outputs/*.csv
 model_lab/results/*_per_row.csv
-nli_baseline_testing_and_finetuning/.venv/
-nli_baseline_testing_and_finetuning/data/
-nli_baseline_testing_and_finetuning/finetuning/data/
-nli_baseline_testing_and_finetuning/finetuning/finetuned_deberta*/
-nli_baseline_testing_and_finetuning/outputs/**/*predictions.csv
-nli_baseline_testing_and_finetuning/outputs_rerun_20260803_012453/**/*predictions.csv
+nli_finetuning/.venv/
+nli_finetuning/data/
+nli_finetuning/finetuning/data/
+nli_finetuning/finetuning/finetuned_deberta*/
+nli_finetuning/outputs/**/*predictions.csv
+nli_finetuning/outputs_rerun/**/*predictions.csv

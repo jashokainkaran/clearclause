@@ -137,7 +137,7 @@ checkpoint from Hugging Face Hub at `NLI_MODEL_PATH` instead.
   per-row output are not included; only the aggregate summary metrics
   (`results/source_reference_metrics_summary.csv`) and result charts are.
 
-- **`nli_baseline_testing_and_finetuning/`** — fine-tunes and evaluates the
+- **`nli_finetuning/`** — fine-tunes and evaluates the
   NLI verifier. `finetuning/finetune_deberta.py` (and
   `finetune_deberta_v3_base.py` for the alternate base tried) fine-tunes
   `cross-encoder/nli-deberta-v3-small` into the checkpoint used in
@@ -148,11 +148,12 @@ checkpoint from Hugging Face Hub at `NLI_MODEL_PATH` instead.
   and model-caching utilities. See its own `README.md` for the full dataset
   and fine-tuning methodology. The NLI training/test datasets and every
   trained checkpoint are not included (the checkpoint used by the app is
-  hosted on Hugging Face Hub instead); `outputs/` and
-  `outputs_rerun_20260803_012453/` keep only the aggregate metrics, confusion
-  matrices and classification reports from each evaluation run — the raw
-  per-example prediction files (which embed the claim/evidence text) are
-  excluded.
+  hosted on Hugging Face Hub instead); `outputs/` and `outputs_rerun/` keep
+  only the aggregate metrics, confusion matrices and classification reports
+  from each evaluation run — the raw per-example prediction files (which
+  embed the claim/evidence text) are excluded. Folder/path names here were
+  shortened from the original working copy to stay well under Windows'
+  260-character path limit.
 
 ## Notes
 
