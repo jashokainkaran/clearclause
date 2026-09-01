@@ -20,9 +20,7 @@ and "3. Fine-tuning (scaffold)" for how to reproduce or rerun them.
 *`README-sequential-nli-run.md`, described a launcher script*
 *(`run_all_nli_evaluations.bat` / `run_all_nli_sequential.bat`) that no*
 *longer exists on disk and a "not yet executed" status that was no longer*
-*true; those stale parts were dropped rather than merged. `AGENTS.md`/*
-*`CLAUDE.md` were left as a separate, intentionally-mirrored pair, matching*
-*the same pattern used in `app/`.)*
+*true; those stale parts were dropped rather than merged.)*
 
 - **premise** = original statutory span
 - **hypothesis** = simplified atomic legal claim
@@ -70,8 +68,9 @@ finetuning/                    Fine-tuning scaffold + artifacts (starting point,
   outputs/finetune_v3_base_epoch_metrics.csv            Per-epoch metrics, DeBERTa-v3-base 1st attempt
   outputs/finetune_v3_base_retuned_epoch_metrics.csv    Per-epoch metrics, DeBERTa-v3-base retuned attempt
   outputs/finetune_v3_base_boosted_epoch_metrics.csv    Per-epoch metrics, DeBERTa-v3-base boosted attempt
-finetune_deberta_colab.py       Documented in CLAUDE.md as a Colab-adapted variant of the scaffold;
-                                 does not currently exist in this project (nothing currently depends on it)
+finetune_deberta_colab.py       A Colab-adapted variant of the fine-tuning scaffold, referenced
+                                 in earlier project notes; does not currently exist in this
+                                 project (nothing currently depends on it)
 cache_one_nli_model.py          Download/cache one HF checkpoint by name (no data read)
 run_all_nli_visible_progress.bat / run_and_log_visible_progress.ps1
                                  Double-click launcher: download + evaluate all 5 models in sequence

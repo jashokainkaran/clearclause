@@ -139,9 +139,8 @@ FIXTURES = {
     # person ... must be punished"), which a flat word count let outweigh
     # the branch-specific "six months"/"not". Before the
     # DISTINGUISHING_MATCH_WEIGHT fix, C5/C6/C7 all resolved to ["P1"]
-    # instead of ["P1", "P2"] and showed red/unsupported. See
-    # verification_archive/semantic_evidence_resolver_report.md and
-    # HANDOFF.md's "Evidence-linking: distinguishing-token weighting".
+    # instead of ["P1", "P2"] and showed red/unsupported (see
+    # link_claims_to_spans in backend/evidence.py for the full rationale).
     "rioting_real_llm_wording": (RIOTING, 2, [
         ("C1", "If someone acts maliciously or wantonly and does something illegal, intending or knowing that this action might cause a riot, they are responsible if a riot actually happens.", ["P1"]),
         ("C2", "If a riot occurs because of their provocation, they must be punished with imprisonment for up to one year.", ["P1"]),

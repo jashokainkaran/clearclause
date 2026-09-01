@@ -100,8 +100,8 @@ def _canonical_number(raw: str) -> str:
 # one distinguished by digits. See link_claims_to_spans for why this
 # matters: a claim that repeats a shared head's subject/verb can otherwise
 # outscore the one branch-specific number that actually distinguishes it
-# (documented live failure: outputs/runs/run_20260722_091308_55c782.json,
-# verification_archive/semantic_evidence_resolver_report.md).
+# (see the "rioting_real_llm_wording" fixture in
+# tests/pipeline_tests/test_evidence_units.py for a real, documented case).
 #
 # Deliberately narrow:
 #   - "one" is EXCLUDED from standalone recognition. Unlike the other
@@ -464,11 +464,10 @@ def link_claims_to_spans(
     count that shared vocabulary can outscore the one or two words that
     actually distinguish the branches ("six months" vs "one year",
     "first offence" vs "second offence") — a real, documented failure
-    (outputs/runs/run_20260722_091308_55c782.json; see
-    verification_archive/semantic_evidence_resolver_report.md for the
-    full diagnosis). evidence_score below IS this weighted total, not a
-    plain word count, so what's shown to a caller is exactly what decided
-    the winner.
+    (see the "rioting_real_llm_wording" fixture in
+    tests/pipeline_tests/test_evidence_units.py). evidence_score below IS
+    this weighted total, not a plain word count, so what's shown to a
+    caller is exactly what decided the winner.
 
     Ranking key, highest wins:
       1. Weighted score (generic lexical matches x1 + number matches x

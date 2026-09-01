@@ -146,8 +146,7 @@ def test_numbers_are_not_counted_twice_in_the_raw_score():
     # span share one lexical token ("penalty") plus the number 18.
     #
     # Numbers are now deliberately weighted (DISTINGUISHING_MATCH_WEIGHT) rather than
-    # excluded from the score entirely -- see link_claims_to_spans and
-    # verification_archive/semantic_evidence_resolver_report.md for why a
+    # excluded from the score entirely -- see link_claims_to_spans for why a
     # flat, number-blind score let a shared-vocabulary lead beat the one
     # number that actually distinguishes two sibling branches. So the
     # expected value here is 1 generic match + 1 number match x
@@ -229,9 +228,8 @@ def test_empty_claims_list_is_handled_safely():
 
 # ---------------------------------------------------------------------------
 # Word-number recognition (E) — _word_number_value / _WORD_NUMBER_PATTERN,
-# added alongside the DISTINGUISHING_MATCH_WEIGHT fix. See
-# verification_archive/semantic_evidence_resolver_report.md and
-# HANDOFF.md's "Evidence-linking: distinguishing-token weighting".
+# added alongside the DISTINGUISHING_MATCH_WEIGHT fix (see
+# link_claims_to_spans in backend/evidence.py for the full rationale).
 # ---------------------------------------------------------------------------
 
 @pytest.mark.parametrize("word,expected", [

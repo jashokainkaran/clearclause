@@ -7,12 +7,6 @@ outputs/runs/
 *.env
 !backend/.env.example
 
-# AI-assistant/dev-process notes (local only, not part of the deployable app)
-CLAUDE.md
-AGENTS.md
-HANDOFF.md
-verification_archive/
-
 # Non-app thesis artefact that ended up in this folder
 FYP Midpoint Report.pdf
 
@@ -28,7 +22,6 @@ __pycache__/
 # keep code + small result summaries only. Never re-add local venvs, raw
 # statute PDFs/datasets, per-row text-bearing CSVs, or checkpoint weights
 # here even if they exist in the original working folders outside app/.
-.claude/
 .ipynb_checkpoints/
 *token*.txt
 data_processing/.venv/
