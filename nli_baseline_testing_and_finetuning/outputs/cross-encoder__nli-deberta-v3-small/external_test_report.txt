@@ -1,0 +1,63 @@
+NLI Diagnostic Baseline Report
+Model: cross-encoder/nli-deberta-v3-small
+Dataset: external_test
+Row count: 175
+Label distribution: contradiction=43, entailment=88, neutral=44
+Duplicate nli_id count: 0
+
+Accuracy: 0.8114
+Macro F1: 0.7706
+Entailment recall: 0.9091
+Neutral recall: 1.0000
+Contradiction recall: 0.4186
+Contradiction F1: 0.5806
+
+Per-label metrics:
+Label             Precision      Recall          F1     Support
+contradiction        0.9474      0.4186      0.5806          43
+entailment           0.8000      0.9091      0.8511          88
+neutral              0.7857      1.0000      0.8800          44
+
+Confusion matrix (rows = gold, columns = predicted):
+gold\pred         contradiction     entailment        neutral
+contradiction                18             20              5
+entailment                    1             80              7
+neutral                       0              0             44
+
+Total incorrect predictions: 33
+
+Incorrect predictions:
+nli_id      source_id   split         gold_label    pred_label    confidence error_type          hypothesis                                                  
+NLI_000003  MA_S10      external_test contradiction entailment    0.9943     modality_change     Every application for a maintenance order, or to enforce one, may be in writing, must be signed by the applicant or the person making it on his behalf, and is free of any stamp duty.
+NLI_000007  MA_S11_1    external_test contradiction entailment    0.9856     modality_change     Every application for a maintenance order, or to enforce one, may be supported by an affidavit stating the facts in support of the application.
+NLI_000009  MA_S11_1    external_test contradiction entailment    0.9975     modality_change     If the Magistrate is satisfied that the facts in the affidavit are sufficient, he may issue a summons, together with a copy of the affidavit, on the person against whom the application is made, to appear and show cause why the application should not be granted.
+NLI_000012  MA_S11_1    external_test contradiction neutral       0.9849     modality_change     However, the Magistrate must at any time, in his discretion, make an interim order for the payment of a monthly allowance, which remains in force until an order on the application is made, unless it is earlier varied or revoked, and which takes effect from the date of the application or from any later date the Magistrate fixes.
+NLI_000013  MA_S11_1    external_test entailment    neutral       0.9986     none                However, the Magistrate may at any time, in his discretion, make an interim order for the payment of a monthly allowance, which remains in force until an order on the application is made, unless it is earlier varied or revoked, and which takes effect from the date of the application or from any later date the Magistrate fixes.
+NLI_000014  MA_S11_2    external_test contradiction entailment    0.9960     modality_change     After whatever inquiry he considers necessary, the Magistrate may make an order allowing or refusing the application, and if necessary may make an order under section 5 or section 6.
+NLI_000019  MA_S12_1    external_test contradiction neutral       0.9945     role_change         The Magistrate may proceed in the manner provided in Chapters V and VI of the Code of Criminal Procedure Act, No. 15 of 1979, to compel the attendance of the person against whom the application is made, and of any person whose evidence is required by the applicant, by that person, or by a police officer, and to compel the production of any document needed for the inquiry.
+NLI_000022  MA_S12_2    external_test entailment    neutral       0.9921     none                When the person against whom the application is made is absent, section 192 of the Code of Criminal Procedure Act, No. 15 of 1979, applies with the necessary changes.
+NLI_000023  MA_S13      external_test contradiction entailment    0.9632     modality_change     Subject to subsection (2) of section 12, all evidence taken by a Magistrate under this Act may be taken in the presence of the person against whom the application is made, or, when the Magistrate does not require his personal attendance, in the presence of his attorney-at-law, if any, and must be recorded in the manner prescribed for trials in the Magistrate's Court.
+NLI_000030  MA_S14_1    external_test entailment    neutral       0.9857     none                Sections 320 to 330, and sections 357 and 358, of the Code of Criminal Procedure Act, No. 15 of 1979, apply to the appeal with the necessary changes.
+NLI_000032  MA_S14_1    external_test contradiction entailment    0.9982     exception_removed   However, despite anything to the contrary in section 323 of that Act, an order under section 2 is not stayed because of the appeal.
+NLI_000033  MA_S14_1    external_test entailment    neutral       0.9996     none                However, despite anything to the contrary in section 323 of that Act, an order under section 2 is not stayed because of the appeal, unless the High Court directs otherwise for reasons to be recorded.
+NLI_000034  MA_S14_1    external_test contradiction entailment    0.9955     modality_change     In forwarding the record to the High Court, the Magistrate may keep a copy of his order for the purpose of enforcement.
+NLI_000038  MA_S15      external_test contradiction entailment    0.9980     modality_change     The forms set out in the Schedule to this Act, with whatever variations the circumstances of a case may require, may be used for the purposes stated in them.
+NLI_000048  MA_S20_1    external_test contradiction entailment    0.9983     modality_change     Despite the repeal of the Maintenance Ordinance, all proceedings instituted under that Ordinance, and all appeals from orders made under it, that were pending on the day before this Act came into force, may be heard and disposed of in all respects as though that Ordinance had not been repealed.
+NLI_000064  MA_S22      external_test entailment    contradiction 0.9940     none                'Non-marital', in relation to a child or offspring, means a child or offspring born to parents who are not married.
+NLI_000093  MA_S2_5     external_test contradiction entailment    0.9912     exception_removed   Where a Magistrate makes an order for payment of an allowance on an application under subsection (1), (2), (3), or (4), the allowance is payable from the date the application for maintenance was made to the court, for reasons to be recorded, orders payment from another date.
+NLI_000108  MA_S5_2     external_test contradiction neutral       0.7700     role_change         The Magistrate may, if any person entitled to receive payment under a maintenance order applies for it, before passing a sentence of imprisonment on the respondent, issue a warrant directing the amount in default to be levied in the manner provided by law for levying fines imposed by Magistrates in a police officer's Courts.
+NLI_000110  MA_S6_1     external_test contradiction entailment    0.9962     modality_change     If a person entitled to receive payment under a maintenance order applies, and it appears to the Magistrate that the respondent has defaulted in paying maintenance for more than two months, the Magistrate must, after inquiry, make an order called an attachment of salary order.
+NLI_000115  MA_S6_1     external_test contradiction neutral       0.9968     role_change         The attachment of salary order also requires that person to remit the deducted amount at once to the applicant in the manner the police directs.
+NLI_000118  MA_S6_10    external_test contradiction entailment    0.9948     modality_change     An employer who makes any payment under an attachment of salary order may at once give the respondent a written statement stating the amount deducted from his salary under that order.
+NLI_000133  MA_S6_2     external_test contradiction entailment    0.9902     modality_change     Before making an order under subsection (1), the Magistrate may give notice to the person he proposes to serve it on, to show cause why the order should not be made, and require him to furnish the court, within the period stated, with the respondent's salary particulars.
+NLI_000135  MA_S6_2     external_test contradiction entailment    0.9940     modality_change     An order under subsection (1) may be appealed to a High Court established by Article 154P of the Constitution by any person aggrieved by it, but despite the appeal the Magistrate must decide to continue proceedings under this Act, and section 14 of this Act applies to every such appeal.
+NLI_000138  MA_S6_2     external_test entailment    neutral       0.9979     none                The Magistrate may also, by an order served on the respondent, require him to furnish the court, within the period stated, with a statement giving the name and address of his employer or employers if he has more than one, the particulars of his salary including deductions so far as he knows them, and any other particulars needed to enable his employer or employers to identify him.
+NLI_000139  MA_S6_3     external_test contradiction entailment    0.9952     exception_removed   A statement furnished in compliance with an order under paragraph (b) of subsection (2) is, in any court proceedings, received as evidence and treated as prima facie proof of the particulars referred to in that paragraph.
+NLI_000144  MA_S6_5     external_test contradiction entailment    0.9971     modality_change     In deciding the amount to be deducted from the respondent's salary under subsection (1), the Magistrate may have regard to the resources and needs of the respondent, and to the needs of the person whose maintenance is in default.
+NLI_000150  MA_S6_8     external_test entailment    neutral       0.9974     none                A person to whom an attachment of salary order is directed must, subject to this Act, comply with the order, or, if it is later varied under subsection (7), with the order as varied.
+NLI_000153  MA_S6_9     external_test entailment    neutral       0.9935     none                In that case, despite anything to the contrary in any other written law, the employer must first give effect to the order of attachment made under this Act.
+NLI_000156  MA_S7_1     external_test contradiction entailment    0.7920     modality_change     Where a maintenance order is made under this Act, the Magistrate must direct the respondent to deposit the amount due under the order each month, on or before the date stated in the order, in favour of the person entitled to payment, at the post office or bank stated in the order, and that person may draw the amount so deposited from that post office or bank.
+NLI_000164  MA_S7_2     external_test contradiction neutral       0.9725     role_change         If a police officer is satisfied after due inquiry that there has been a default, he may impose whatever punishment this Act provides for such a default.
+NLI_000167  MA_S8       external_test contradiction entailment    0.5002     modality_change     On the application of any person receiving, or ordered to pay, a monthly allowance under this Act, and on proof of a change in the circumstances of any person for whose benefit or against whom a maintenance order has been made, the Magistrate must either cancel the order or make whatever alteration in the allowance he thinks fit.
+NLI_000169  MA_S8       external_test contradiction entailment    0.9843     exception_removed   The cancellation or alteration takes effect from the date the application for it was made to the court, for reasons to be recorded, orders otherwise.
+NLI_000172  MA_S9       external_test contradiction entailment    0.9871     modality_change     A copy of the maintenance order, certified under the hand of the Magistrate, may be given without payment to the person in whose favour it is made, or to his or her guardian or a person having actual custody of that person, or to the person to whom the allowance is to be paid.

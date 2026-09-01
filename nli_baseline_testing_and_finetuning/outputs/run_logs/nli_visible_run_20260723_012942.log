@@ -1,0 +1,64 @@
+ClearClause Sequential NLI Download and Evaluation
+Start: 07/23/2026  1:29:42.80
+Project root: D:\nli_baseline_test\
+Python: D:\nli_baseline_test\.venv\Scripts\python.exe
+HF_HOME: D:\AI_Cache\huggingface
+HF_HUB_CACHE: D:\AI_Cache\huggingface\hub
+
+Python selected: D:\nli_baseline_test\.venv\Scripts\python.exe
+
+============================================================
+Model: RoBERTa-large-MNLI
+Hugging Face ID: FacebookAI/roberta-large-mnli
+Download start: 07/23/2026  1:29:46.91
+Download log: D:\nli_baseline_test\outputs\run_logs\roberta_large_mnli_download_20260723_012942.log
+============================================================
+Download/cache successful for RoBERTa-large-MNLI.
+Download and evaluation completed successfully.
+
+============================================================
+Model: DeBERTa-v3-base
+Hugging Face ID: MoritzLaurer/DeBERTa-v3-base-mnli-fever-anli
+Download start: 07/23/2026  1:46:31.08
+Download log: D:\nli_baseline_test\outputs\run_logs\deberta_v3_base_download_20260723_012942.log
+============================================================
+Download/cache successful for DeBERTa-v3-base.
+Download and evaluation completed successfully.
+
+============================================================
+Model: ModernBERT-base-NLI
+Hugging Face ID: tasksource/ModernBERT-base-nli
+Download start: 07/23/2026  3:10:32.71
+Download log: D:\nli_baseline_test\outputs\run_logs\modernbert_nli_download_20260723_012942.log
+============================================================
+Download/cache successful for ModernBERT-base-NLI.
+Download and evaluation completed successfully.
+
+============================================================
+Model: DeBERTa-v3-small
+Hugging Face ID: cross-encoder/nli-deberta-v3-small
+Download start: 07/23/2026  3:19:49.25
+Download log: D:\nli_baseline_test\outputs\run_logs\deberta_v3_small_download_20260723_012942.log
+============================================================
+Download/cache successful for DeBERTa-v3-small.
+Download and evaluation completed successfully.
+
+============================================================
+Model: DistilRoBERTa-NLI
+Hugging Face ID: cross-encoder/nli-distilroberta-base
+Download start: 07/23/2026  3:26:47.60
+Download log: D:\nli_baseline_test\outputs\run_logs\distilroberta_nli_download_20260723_012942.log
+============================================================
+Download/cache successful for DistilRoBERTa-NLI.
+Download and evaluation completed successfully.
+
+Final summary
+End: 07/23/2026  3:30:34.12
+Total models: 5
+Downloads successful: 5
+Downloads failed: 0
+Evaluations successful: 5
+Evaluations failed: 0
+Evaluations skipped after download failure: 0
+Evaluations with missing outputs: 0
+Summary CSV: D:\nli_baseline_test\outputs\run_logs\nli_visible_run_20260723_012942_summary.csv

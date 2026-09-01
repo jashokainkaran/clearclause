@@ -1,0 +1,52 @@
+NLI Diagnostic Baseline Report
+Model: D:\nli_baseline_test\finetuning\finetuned_deberta_v3_base_boosted
+Device: cpu
+Batch size: 16
+Max sequence length: 512
+PyTorch version: 2.13.0+cpu
+Transformers version: 5.14.1
+Dataset: internal_test
+Row count: 547
+Label distribution: contradiction=115, entailment=279, neutral=153
+Duplicate nli_id count: 0
+
+Accuracy: 0.9744
+Macro F1: 0.9712
+Weighted F1: 0.9743
+Entailment recall: 0.9785
+Neutral recall: 1.0000
+Neutral precision: 1.0000
+Contradiction recall: 0.9304
+Contradiction F1: 0.9386
+
+Per-label metrics:
+Label             Precision      Recall          F1     Support
+contradiction        0.9469      0.9304      0.9386         115
+entailment           0.9715      0.9785      0.9750         279
+neutral              1.0000      1.0000      1.0000         153
+
+Confusion matrix (rows = gold, columns = predicted):
+gold\pred         contradiction     entailment        neutral
+contradiction               107              8              0
+entailment                    6            273              0
+neutral                       0              0            153
+(Also saved separately as <dataset>_confusion_matrix.csv)
+
+Total incorrect predictions: 14
+
+Incorrect predictions:
+nli_id      source_id   split         gold_label    pred_label    confidence error_type          hypothesis                                                  
+NLI_000193  PC_S101     internal_test entailment    contradiction 0.9985     none                For example, if A, with a guilty intention, encourages a child or a person of unsound mind to do an act that would be an offence if done by a capable person with A's intention, A is guilty of encouraging an offence whether or not the act is committed.
+NLI_000197  PC_S106     internal_test contradiction entailment    0.9997     exception_removed   When an act is encouraged with the intention of causing a particular effect, and the act for which the encourager is liable causes a different effect, the encourager is liable for the effect caused, in the same way and to the same extent as if he had encouraged the act intending that effect.
+NLI_000290  PC_S185     internal_test contradiction entailment    0.9971     modality_change     For example, if a lawfully empowered public servant promulgates an order that a religious procession may pass down a certain street, and A knowingly disobeys it and thereby causes danger of a riot, A commits this offence.
+NLI_000575  PC_S308A_2  internal_test entailment    contradiction 0.9368     none                A person who commits this offence may also be fined.
+NLI_000577  PC_S308A_2  internal_test entailment    contradiction 0.9958     none                A person who commits this offence may also be ordered to pay compensation, in an amount fixed by the court, to the person against whom the offence was committed for the injuries caused.
+NLI_000628  PC_S360A_1  internal_test entailment    contradiction 0.8091     none                A person convicted of the offence of procuration may also be fined.
+NLI_000649  PC_S360B_1  internal_test entailment    contradiction 0.8023     none                A person convicted of the offence of sexual exploitation of children may also be fined.
+NLI_000740  PC_S486     internal_test contradiction entailment    0.8056     negation_change     A person who does not commit the offence of criminal intimidation can also be fined.
+NLI_000756  PC_S489     internal_test contradiction entailment    0.9923     negation_change     If the offence to which the oath, engagement, or obligation relates is punishable with death or imprisonment for twenty years, the person cannot be fined.
+NLI_000759  PC_S489     internal_test contradiction entailment    0.7894     negation_change     If the offence to which the oath, engagement, or obligation relates is punishable with death or imprisonment for twenty years, the person cannot be punished with both imprisonment and a fine.
+NLI_000782  PC_S69      internal_test entailment    contradiction 0.8712     none                For example, if A, a soldier, fires on a mob on his superior officer's order in keeping with the commands of the law, A commits no offence.
+NLI_000788  PC_S71      internal_test contradiction entailment    0.9995     exception_removed   This is so even if the court had no jurisdiction to make that judgment or order.
+NLI_000804  PC_S92_4    internal_test contradiction entailment    0.9988     exception_removed   A person does not lose the right of private defence against an act done, or attempted, by a public servant.
+NLI_000807  PC_S92_4    internal_test contradiction entailment    0.9990     exception_removed   A person does not lose the right of private defence against an act done, or attempted, on the direction of a public servant, or unless that person states the authority under which he acts, or, if he has written authority, produces it when demanded.

@@ -1,0 +1,34 @@
+ClearClause NLI - v2 dataset leakage removal report
+=======================================================
+Leakage definition: an evaluation row whose normalised
+(premise, hypothesis) pair also occurs in the TRAIN file.
+Only such rows are removed, and only from validation /
+internal_test. Train and external are copied unchanged.
+
+[validation]
+  original rows:            530
+  rows removed (leaked):    101
+  rows kept (v2):           429
+  label dist BEFORE:        entailment=271, neutral=138, contradiction=121
+  label dist AFTER (v2):    entailment=206, neutral=129, contradiction=94
+  removed-by-label:         entailment=65, contradiction=27, neutral=9
+  removed-by-error_type:    none=65, imprisonment_change=27, unsupported_consequence=2, unsupported_deadline=2, unsupported_document=1, unsupported_condition=1, unsupported_location=1, unsupported_authority=1, unsupported_procedure=1
+
+[internal_test]
+  original rows:            634
+  rows removed (leaked):    87
+  rows kept (v2):           547
+  label dist BEFORE:        entailment=331, neutral=168, contradiction=135
+  label dist AFTER (v2):    entailment=279, neutral=153, contradiction=115
+  removed-by-label:         entailment=52, contradiction=20, neutral=15
+  removed-by-error_type:    none=52, imprisonment_change=19, unsupported_location=3, unsupported_authority=3, unsupported_deadline=2, unsupported_document=2, unsupported_condition=2, unsupported_consequence=2, unsupported_procedure=1, age_change=1
+
+Post-cleaning verification (should be 0):
+  validation v2 rows still overlapping train: 0
+  internal_test v2 rows still overlapping train: 0
+
+Files written (originals unchanged):
+  data/nli final clean train v2.csv           (copy of train)
+  data/nli final clean validation v2.csv      (deduped)
+  data/nli final clean internal test v2.csv   (deduped)
+  data/nli final clean external test v2.csv   (copy of external)

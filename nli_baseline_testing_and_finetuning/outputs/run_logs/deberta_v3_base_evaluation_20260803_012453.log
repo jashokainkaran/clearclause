@@ -1,0 +1,30 @@
+﻿**********************
+Windows PowerShell transcript start
+Start time: 20260803014006
+Username: ASHOK-X360\jasho
+RunAs User: ASHOK-X360\jasho
+Configuration Name: 
+Machine: ASHOK-X360 (Microsoft Windows NT 10.0.26200.0)
+Host Application: powershell -NoProfile -ExecutionPolicy Bypass -File D:\nli_baseline_test\run_and_log_visible_progress.ps1 -PythonExe D:\nli_baseline_test\.venv\Scripts\python.exe -ScriptPath D:\nli_baseline_test\evaluation_scripts\evaluate_deberta_v3_base.py -LogPath D:\nli_baseline_test\outputs\run_logs\deberta_v3_base_evaluation_20260803_012453.log
+Process ID: 25248
+PSVersion: 5.1.26100.8875
+PSEdition: Desktop
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1.26100.8875
+BuildVersion: 10.0.26100.8875
+CLRVersion: 4.0.30319.42000
+WSManStackVersion: 3.0
+PSRemotingProtocolVersion: 2.3
+SerializationVersion: 1.1.0.1
+**********************
+Start: 2026-08-03 01:40:06
+Python: D:\nli_baseline_test\.venv\Scripts\python.exe
+Script: D:\nli_baseline_test\evaluation_scripts\evaluate_deberta_v3_base.py
+
+
+
+End: 2026-08-03 03:03:12
+Exit code: 0
+**********************
+Windows PowerShell transcript end
+End time: 20260803030312
+**********************

@@ -1,0 +1,5 @@
+epoch_num,epoch,step,eval_loss,eval_accuracy,eval_macro_f1,eval_contradiction_recall,eval_contradiction_f1,eval_entailment_recall,eval_neutral_recall
+1,1.0,334,0.1691,0.9744,0.9714,0.9043,0.9444,0.9903,1.0
+2,2.0,668,0.1413,0.986,0.9842,0.9362,0.967,1.0,1.0
+3,3.0,1002,0.0886,0.9883,0.9871,0.9681,0.9733,0.9903,1.0
+4,4.0,1336,0.1746,0.9883,0.9869,0.9468,0.9727,1.0,1.0

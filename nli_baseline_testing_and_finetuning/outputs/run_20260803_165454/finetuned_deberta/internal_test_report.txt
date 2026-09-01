@@ -1,0 +1,48 @@
+NLI Diagnostic Baseline Report
+Model: D:\nli_baseline_test\finetuning\finetuned_deberta
+Device: cpu
+Batch size: 16
+Max sequence length: 512
+PyTorch version: 2.13.0+cpu
+Transformers version: 5.14.1
+Dataset: internal_test
+Row count: 547
+Label distribution: contradiction=115, entailment=279, neutral=153
+Duplicate nli_id count: 0
+
+Accuracy: 0.9817
+Macro F1: 0.9792
+Weighted F1: 0.9816
+Entailment recall: 0.9892
+Neutral recall: 1.0000
+Neutral precision: 0.9871
+Contradiction recall: 0.9391
+Contradiction F1: 0.9600
+
+Per-label metrics:
+Label             Precision      Recall          F1     Support
+contradiction        0.9818      0.9391      0.9600         115
+entailment           0.9787      0.9892      0.9840         279
+neutral              0.9871      1.0000      0.9935         153
+
+Confusion matrix (rows = gold, columns = predicted):
+gold\pred         contradiction     entailment        neutral
+contradiction               108              6              1
+entailment                    2            276              1
+neutral                       0              0            153
+(Also saved separately as <dataset>_confusion_matrix.csv)
+
+Total incorrect predictions: 10
+
+Incorrect predictions:
+nli_id      source_id   split         gold_label    pred_label    confidence error_type          hypothesis                                                  
+NLI_000195  PC_S101     internal_test contradiction entailment    0.9368     negation_change     As a further example, if A instigates B to set fire to a house, and B, being of unsound mind and unable to know the act is wrong, sets fire to it, B commits an offence, but A is guilty of encouraging the offence and is liable to its punishment.
+NLI_000197  PC_S106     internal_test contradiction entailment    0.9905     exception_removed   When an act is encouraged with the intention of causing a particular effect, and the act for which the encourager is liable causes a different effect, the encourager is liable for the effect caused, in the same way and to the same extent as if he had encouraged the act intending that effect.
+NLI_000290  PC_S185     internal_test contradiction entailment    0.7034     modality_change     For example, if a lawfully empowered public servant promulgates an order that a religious procession may pass down a certain street, and A knowingly disobeys it and thereby causes danger of a riot, A commits this offence.
+NLI_000349  PC_S19      internal_test entailment    contradiction 1.0000     none                Fourth, every judge is a public servant.
+NLI_000379  PC_S190     internal_test contradiction neutral       0.5631     role_change         An investigation directed by law before a proceeding in a police officer is a stage of a judicial proceeding, even if it does not take place before a Court of Justice.
+NLI_000493  PC_S27      internal_test entailment    contradiction 0.4827     none                A cheque on a banker, a power of attorney, a map or plan intended or usable as evidence, and a writing containing directions or instructions are all documents.
+NLI_000549  PC_S286B_2  internal_test entailment    neutral       0.9725     none                A person referred to in subsection (1) who knows that any such computer facility is being used to commit an act constituting an offence relating to the sexual abuse of a child must at once inform the officer in charge of the nearest police station of that fact, and give any information he has about the act and the identity of the alleged offender.
+NLI_000788  PC_S71      internal_test contradiction entailment    0.9920     exception_removed   This is so even if the court had no jurisdiction to make that judgment or order.
+NLI_000804  PC_S92_4    internal_test contradiction entailment    0.9998     exception_removed   A person does not lose the right of private defence against an act done, or attempted, by a public servant.
+NLI_000807  PC_S92_4    internal_test contradiction entailment    0.9847     exception_removed   A person does not lose the right of private defence against an act done, or attempted, on the direction of a public servant, or unless that person states the authority under which he acts, or, if he has written authority, produces it when demanded.

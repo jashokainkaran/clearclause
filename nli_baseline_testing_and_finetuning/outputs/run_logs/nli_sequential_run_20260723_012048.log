@@ -1,0 +1,14 @@
+ClearClause Sequential NLI Download and Evaluation
+Start: 07/23/2026  1:20:48.58
+Project root: D:\nli_baseline_test\
+Python: D:\nli_baseline_test\.venv\Scripts\python.exe
+
+Python selected: D:\nli_baseline_test\.venv\Scripts\python.exe
+
+============================================================
+Model: RoBERTa-large-MNLI
+Hugging Face ID: FacebookAI/roberta-large-mnli
+Download start: 07/23/2026  1:21:04.32
+Download log: D:\nli_baseline_test\outputs\run_logs\roberta_large_mnli_download_20260723_012048.log
+============================================================
+Download/cache successful for RoBERTa-large-MNLI.

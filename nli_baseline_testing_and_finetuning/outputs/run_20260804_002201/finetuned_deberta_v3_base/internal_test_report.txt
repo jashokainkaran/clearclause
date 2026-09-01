@@ -1,0 +1,50 @@
+NLI Diagnostic Baseline Report
+Model: D:\nli_baseline_test\finetuning\finetuned_deberta_v3_base
+Device: cpu
+Batch size: 16
+Max sequence length: 512
+PyTorch version: 2.13.0+cpu
+Transformers version: 5.14.1
+Dataset: internal_test
+Row count: 547
+Label distribution: contradiction=115, entailment=279, neutral=153
+Duplicate nli_id count: 0
+
+Accuracy: 0.9781
+Macro F1: 0.9756
+Weighted F1: 0.9781
+Entailment recall: 0.9749
+Neutral recall: 1.0000
+Neutral precision: 1.0000
+Contradiction recall: 0.9565
+Contradiction F1: 0.9483
+
+Per-label metrics:
+Label             Precision      Recall          F1     Support
+contradiction        0.9402      0.9565      0.9483         115
+entailment           0.9819      0.9749      0.9784         279
+neutral              1.0000      1.0000      1.0000         153
+
+Confusion matrix (rows = gold, columns = predicted):
+gold\pred         contradiction     entailment        neutral
+contradiction               110              5              0
+entailment                    7            272              0
+neutral                       0              0            153
+(Also saved separately as <dataset>_confusion_matrix.csv)
+
+Total incorrect predictions: 12
+
+Incorrect predictions:
+nli_id      source_id   split         gold_label    pred_label    confidence error_type          hypothesis                                                  
+NLI_000197  PC_S106     internal_test contradiction entailment    0.9996     exception_removed   When an act is encouraged with the intention of causing a particular effect, and the act for which the encourager is liable causes a different effect, the encourager is liable for the effect caused, in the same way and to the same extent as if he had encouraged the act intending that effect.
+NLI_000290  PC_S185     internal_test contradiction entailment    0.9981     modality_change     For example, if a lawfully empowered public servant promulgates an order that a religious procession may pass down a certain street, and A knowingly disobeys it and thereby causes danger of a riot, A commits this offence.
+NLI_000527  PC_S286A_2  internal_test entailment    contradiction 0.8869     none                A person convicted of the offence of obscene publication and exhibition relating to children may also be fined.
+NLI_000575  PC_S308A_2  internal_test entailment    contradiction 0.9957     none                A person who commits this offence may also be fined.
+NLI_000577  PC_S308A_2  internal_test entailment    contradiction 0.9992     none                A person who commits this offence may also be ordered to pay compensation, in an amount fixed by the court, to the person against whom the offence was committed for the injuries caused.
+NLI_000628  PC_S360A_1  internal_test entailment    contradiction 0.9983     none                A person convicted of the offence of procuration may also be fined.
+NLI_000649  PC_S360B_1  internal_test entailment    contradiction 0.9988     none                A person convicted of the offence of sexual exploitation of children may also be fined.
+NLI_000774  PC_S67      internal_test entailment    contradiction 0.9999     none                For example, if A gives Z fifty strokes with a stick, A may have committed voluntarily causing hurt both by the whole beating and by each separate blow, but he is liable to only one punishment for the whole beating, not one for each blow.
+NLI_000782  PC_S69      internal_test entailment    contradiction 0.7494     none                For example, if A, a soldier, fires on a mob on his superior officer's order in keeping with the commands of the law, A commits no offence.
+NLI_000788  PC_S71      internal_test contradiction entailment    0.9993     exception_removed   This is so even if the court had no jurisdiction to make that judgment or order.
+NLI_000804  PC_S92_4    internal_test contradiction entailment    0.9978     exception_removed   A person does not lose the right of private defence against an act done, or attempted, by a public servant.
+NLI_000807  PC_S92_4    internal_test contradiction entailment    0.9985     exception_removed   A person does not lose the right of private defence against an act done, or attempted, on the direction of a public servant, or unless that person states the authority under which he acts, or, if he has written authority, produces it when demanded.

@@ -1,0 +1,88 @@
+NLI Diagnostic Baseline Report
+Model: FacebookAI/roberta-large-mnli
+Device: cpu
+Batch size: 1
+Max sequence length: 512
+PyTorch version: 2.13.0+cpu
+Transformers version: 5.14.1
+Dataset: validation
+Row count: 530
+Label distribution: contradiction=121, entailment=271, neutral=138
+Duplicate nli_id count: 0
+
+Accuracy: 0.9057
+Macro F1: 0.8925
+Weighted F1: 0.9052
+Entailment recall: 0.9225
+Neutral recall: 1.0000
+Neutral precision: 0.7977
+Contradiction recall: 0.7603
+Contradiction F1: 0.8519
+
+Per-label metrics:
+Label             Precision      Recall          F1     Support
+contradiction        0.9684      0.7603      0.8519         121
+entailment           0.9542      0.9225      0.9381         271
+neutral              0.7977      1.0000      0.8875         138
+
+Confusion matrix (rows = gold, columns = predicted):
+gold\pred         contradiction     entailment        neutral
+contradiction                92             12             17
+entailment                    3            250             18
+neutral                       0              0            138
+(Also saved separately as <dataset>_confusion_matrix.csv)
+
+Total incorrect predictions: 50
+
+Incorrect predictions:
+nli_id      source_id   split         gold_label    pred_label    confidence error_type          hypothesis                                                  
+NLI_003492  PC_S124     validation    contradiction neutral       0.8551     imprisonment_change A public servant who commits this offence is punishable with imprisonment of either description for up to five years.
+NLI_003493  PC_S124     validation    entailment    neutral       0.9839     none                A public servant who commits this offence is punishable with imprisonment of either description for up to twenty years.
+NLI_003495  PC_S124     validation    entailment    neutral       0.9914     none                A public servant who commits this offence can also be fined.
+NLI_003497  PC_S149     validation    contradiction neutral       0.6667     role_change         A person who assaults or threatens to assault, or obstructs or attempts to obstruct, any public servant carrying out his duty of dispersing an unlawful assembly or suppressing a riot or affray, or who uses, threatens, or attempts to use criminal force against such a private citizen commits this offence.
+NLI_003522  PC_S161     validation    entailment    neutral       0.9547     none                A public servant, in respect of whom either of the offences defined in sections 159 and 160 is committed, and who encourages or helps that offence commits this offence.
+NLI_003531  PC_S161     validation    contradiction entailment    0.7466     imprisonment_change For example, if A is a public servant and B, A's wife, receives a present as a motive for asking A to give an office to a particular person, and A encourages her to do so, then B is punishable with imprisonment for up to five years, or a fine, or both, and A is punishable with imprisonment for up to three years, or a fine, or both.
+NLI_003545  PC_S172     validation    contradiction neutral       0.6425     role_change         If the summons, notice, order, or proclamation is to attend in person or by agent in a police officer, he can be fined up to one hundred rupees.
+NLI_003548  PC_S172     validation    contradiction neutral       0.5319     role_change         If the summons, notice, order, or proclamation is to attend in person or by agent in a police officer, he can be punished with both imprisonment and a fine.
+NLI_003555  PC_S177     validation    contradiction neutral       0.3913     role_change         A person who is legally bound to state the truth on any subject to a private citizen, and who refuses to answer a question about that subject that the public servant lawfully demands commits this offence.
+NLI_003574  PC_S187     validation    contradiction entailment    0.6762     role_change         A person who threatens injury to another in order to induce him to refrain from making a lawful application for protection against injury to a private citizen legally empowered to give or arrange such protection commits this offence.
+NLI_003577  PC_S187     validation    contradiction neutral       0.4607     imprisonment_change A person who commits this offence is punishable with imprisonment of either description for up to five years.
+NLI_003594  PC_S217     validation    contradiction neutral       0.8367     role_change         A public servant legally bound to catch or keep in confinement a person under sentence of a police officer for an offence, or a person lawfully committed to custody, who intentionally fails to catch him, intentionally allows him to escape, or intentionally aids his escape or attempted escape commits this offence.
+NLI_003597  PC_S217     validation    contradiction entailment    0.9859     number_change       If that person is subject, by sentence, to imprisonment for a term less than three years, or was lawfully committed to custody, he can be punished with both imprisonment and a fine.
+NLI_003603  PC_S217     validation    contradiction neutral       0.7703     condition_reversal  If it is not the case that the person in confinement or who ought to have been caught is under sentence of death, he can also be fined.
+NLI_003604  PC_S217     validation    entailment    contradiction 0.4834     none                If the person in confinement or who ought to have been caught is under sentence of death, he can also be fined.
+NLI_003613  PC_S217     validation    entailment    contradiction 0.4198     none                If that person is subject, by sentence or by commutation of a sentence, to imprisonment for ten years or more, he can also be fined.
+NLI_003615  PC_S217     validation    contradiction entailment    0.8328     number_change       If that person is subject, by sentence or by commutation of a sentence, to imprisonment for three years or more, he can be punished with both imprisonment and a fine.
+NLI_003621  PC_S217     validation    contradiction entailment    0.9653     number_change       If that person is subject, by sentence, to imprisonment for a term less than three years, or was lawfully committed to custody, he can also be fined.
+NLI_003627  PC_S218     validation    contradiction neutral       0.9900     imprisonment_change A public servant who commits this offence is punishable with simple imprisonment for up to six years.
+NLI_003628  PC_S218     validation    entailment    neutral       0.9914     none                A public servant who commits this offence is punishable with simple imprisonment for up to two years.
+NLI_003630  PC_S218     validation    entailment    neutral       0.9971     none                A public servant who commits this offence can also be fined.
+NLI_003632  PC_S218     validation    entailment    neutral       0.9948     none                A public servant who commits this offence can be punished with both imprisonment and a fine.
+NLI_003660  PC_S227     validation    entailment    neutral       0.7895     none                A person who does the same in respect of a die or instrument for counterfeiting current coin commits this offence.
+NLI_003717  PC_S255     validation    contradiction neutral       0.4943     imprisonment_change A person who commits this offence is punishable with imprisonment of either description for up to six years.
+NLI_003787  PC_S304     validation    entailment    neutral       0.9336     none                A person commits this offence if they commit the offence in section 303 without the woman's consent, whether or not she is quick with child.
+NLI_003799  PC_S315     validation    contradiction entailment    0.7602     exception_removed   A person who voluntarily causes hurt by means of any instrument for shooting, stabbing, or cutting, or any instrument that used as a weapon is likely to cause death, commits an offence.
+NLI_003801  PC_S315     validation    contradiction entailment    0.9414     exception_removed   A person who voluntarily causes hurt by fire or any heated substance, by any poison or corrosive substance, or by any explosive substance commits an offence.
+NLI_003803  PC_S315     validation    contradiction entailment    0.9326     exception_removed   A person who voluntarily causes hurt by any substance harmful to inhale, swallow, or receive into the blood, or by means of any animal, commits an offence.
+NLI_003816  PC_S325     validation    entailment    neutral       0.5203     none                A person who voluntarily causes hurt on grave and sudden provocation, if he neither intends nor knows himself likely to cause hurt to any person other than the one who gave the provocation commits this offence.
+NLI_003825  PC_S344     validation    contradiction neutral       0.4943     imprisonment_change A person who commits this offence is punishable with imprisonment of either description for up to six years.
+NLI_003838  PC_S345     validation    contradiction neutral       0.8868     role_change         A person convicted of the offence of sexual harassment may also be ordered to pay compensation, in an amount fixed by the police, to the person against whom the offence was committed for the injuries caused.
+NLI_003865  PC_S377     validation    entailment    neutral       0.7809     none                If the offence in the accusation is one punishable under section 365, he may be punished with rigorous imprisonment for up to twenty years, and can also be fined.
+NLI_003866  PC_S38_1    validation    entailment    neutral       0.9588     none                Except in the Chapter and sections mentioned in subsections (2) and (3), the word 'offence' means a thing made punishable by this Code.
+NLI_003885  PC_S398     validation    entailment    neutral       0.5434     none                As a further example, if A deceives Z into believing he will deliver a quantity of copra he does not intend to deliver, and so induces Z to advance money, A cheats, but if A intends to deliver the copra when he takes the money and only later breaks the contract, he does not cheat and is liable only to a civil action.
+NLI_003887  PC_S398     validation    entailment    contradiction 0.9443     none                As a further example, if A deceives Z into believing he has performed his part of a contract, which he has not, and so induces Z to pay money, A cheats.
+NLI_003888  PC_S398     validation    entailment    neutral       0.5575     none                As a final example, if A sells an estate to B and then, knowing he has no right to it, sells or mortgages it to Z without disclosing the earlier sale and takes Z's money, A cheats.
+NLI_003890  PC_S398     validation    contradiction entailment    0.9876     modality_change     That act or omission may cause or be likely to cause damage or harm to that person in body, mind, reputation, or property, or damage or loss to the Government.
+NLI_003900  PC_S410     validation    contradiction neutral       0.4832     imprisonment_change A person who commits this offence is punishable with imprisonment of either description for up to six years.
+NLI_003944  PC_S46      validation    contradiction entailment    0.9919     exception_removed   The word 'animal' means any living creature other than a human being.
+NLI_003949  PC_S465     validation    contradiction neutral       0.5319     imprisonment_change A person who commits this offence is punishable with imprisonment of either description for up to five years.
+NLI_003955  PC_S471     validation    contradiction neutral       0.5030     imprisonment_change A person who commits this offence is punishable with imprisonment of either description for up to five years.
+NLI_003960  PC_S478     validation    contradiction neutral       0.4607     imprisonment_change A person who commits this offence is punishable with imprisonment of either description for up to five years.
+NLI_003966  PC_S52      validation    entailment    neutral       0.9498     none                The punishments that offenders can receive under this Code are the following: imprisonment, which is of two kinds, namely rigorous imprisonment, which is with hard labour, and simple imprisonment.
+NLI_003976  PC_S56      validation    entailment    neutral       0.9956     none                For example, if A is convicted of waging war against the Republic and so is liable to forfeit all his property, and after sentence, while it is in force, A's father dies leaving an estate that would otherwise become A's, that estate becomes the property of the Government instead.
+NLI_003985  PC_S82      validation    contradiction neutral       0.6677     age_change          An act done in good faith for the benefit of a person under five years of age or of unsound mind, by or with the consent, express or implied, of the guardian or other person having lawful charge of that person, is not an offence because of any harm it may cause, or that the person doing it may intend or know to be likely, to that person.
+NLI_003986  PC_S82      validation    entailment    neutral       0.7747     none                An act done in good faith for the benefit of a person under twelve years of age or of unsound mind, by or with the consent, express or implied, of the guardian or other person having lawful charge of that person, is not an offence because of any harm it may cause, or that the person doing it may intend or know to be likely, to that person.
+NLI_003991  PC_S82      validation    contradiction entailment    0.7228     negation_change     It applies to doing anything the person knows is likely to cause death, unless the purpose is to prevent death or grievous hurt or to cure a grievous disease or infirmity.
+NLI_003998  PC_S82      validation    entailment    neutral       0.8647     none                It also does not extend to encouraging or helping any offence to which the exception itself would not extend.
+NLI_004000  PC_S82      validation    entailment    neutral       0.7726     none                For example, if A, in good faith and for his child's benefit but without the child's consent, has the child cut for the stone by a surgeon, knowing the operation is likely to cause the child's death but not intending it, A is within this exception because his object was to cure the child.
+NLI_004003  PC_S84      validation    contradiction entailment    0.9789     exception_removed   For example, causing a miscarriage, is an offence regardless of any harm it may cause the woman.

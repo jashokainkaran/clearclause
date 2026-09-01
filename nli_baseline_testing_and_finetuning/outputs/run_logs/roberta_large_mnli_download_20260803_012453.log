@@ -1,0 +1,37 @@
+﻿**********************
+Windows PowerShell transcript start
+Start time: 20260803012527
+Username: ASHOK-X360\jasho
+RunAs User: ASHOK-X360\jasho
+Configuration Name: 
+Machine: ASHOK-X360 (Microsoft Windows NT 10.0.26200.0)
+Host Application: powershell -NoProfile -ExecutionPolicy Bypass -File D:\nli_baseline_test\run_and_log_visible_progress.ps1 -PythonExe D:\nli_baseline_test\.venv\Scripts\python.exe -ScriptPath D:\nli_baseline_test\cache_one_nli_model.py -LogPath D:\nli_baseline_test\outputs\run_logs\roberta_large_mnli_download_20260803_012453.log -ScriptArgs FacebookAI/roberta-large-mnli
+Process ID: 32032
+PSVersion: 5.1.26100.8875
+PSEdition: Desktop
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1.26100.8875
+BuildVersion: 10.0.26100.8875
+CLRVersion: 4.0.30319.42000
+WSManStackVersion: 3.0
+PSRemotingProtocolVersion: 2.3
+SerializationVersion: 1.1.0.1
+**********************
+Start: 2026-08-03 01:25:27
+Python: D:\nli_baseline_test\.venv\Scripts\python.exe
+Script: D:\nli_baseline_test\cache_one_nli_model.py
+Arguments: FacebookAI/roberta-large-mnli
+
+roberta.pooler.dense.bias   | UNEXPECTED |  |
+roberta.pooler.dense.weight | UNEXPECTED |  |
+
+Notes:
+- UNEXPECTED:   can be ignored when loading from different task/architecture; not ok if you expect identical arch.
+
+SUCCESS: FacebookAI/roberta-large-mnli is already cached.
+
+End: 2026-08-03 01:25:35
+Exit code: 0
+**********************
+Windows PowerShell transcript end
+End time: 20260803012535
+**********************

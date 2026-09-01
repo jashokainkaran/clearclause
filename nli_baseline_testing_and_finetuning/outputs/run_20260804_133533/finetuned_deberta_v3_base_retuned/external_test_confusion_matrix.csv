@@ -1,0 +1,4 @@
+gold\pred,contradiction,entailment,neutral
+contradiction,21,21,1
+entailment,2,86,0
+neutral,0,0,44

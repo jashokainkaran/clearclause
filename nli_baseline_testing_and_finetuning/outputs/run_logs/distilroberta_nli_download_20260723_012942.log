@@ -1,0 +1,31 @@
+﻿**********************
+Windows PowerShell transcript start
+Start time: 20260723032647
+Username: ASHOK-X360\jasho
+RunAs User: ASHOK-X360\jasho
+Configuration Name: 
+Machine: ASHOK-X360 (Microsoft Windows NT 10.0.26200.0)
+Host Application: powershell -NoProfile -ExecutionPolicy Bypass -File D:\nli_baseline_test\run_and_log_visible_progress.ps1 -PythonExe D:\nli_baseline_test\.venv\Scripts\python.exe -ScriptPath D:\nli_baseline_test\cache_one_nli_model.py -LogPath D:\nli_baseline_test\outputs\run_logs\distilroberta_nli_download_20260723_012942.log -ScriptArgs cross-encoder/nli-distilroberta-base
+Process ID: 32684
+PSVersion: 5.1.26100.8875
+PSEdition: Desktop
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1.26100.8875
+BuildVersion: 10.0.26100.8875
+CLRVersion: 4.0.30319.42000
+WSManStackVersion: 3.0
+PSRemotingProtocolVersion: 2.3
+SerializationVersion: 1.1.0.1
+**********************
+Start: 2026-07-23 03:26:47
+Python: D:\nli_baseline_test\.venv\Scripts\python.exe
+Script: D:\nli_baseline_test\cache_one_nli_model.py
+Arguments: cross-encoder/nli-distilroberta-base
+
+
+
+End: 2026-07-23 03:27:59
+Exit code: 0
+**********************
+Windows PowerShell transcript end
+End time: 20260723032759
+**********************

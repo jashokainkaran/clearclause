@@ -1,0 +1,77 @@
+NLI Diagnostic Baseline Report
+Model: D:\nli_baseline_test\finetuning\finetuned_deberta_v3_base_retuned
+Device: cpu
+Batch size: 16
+Max sequence length: 512
+PyTorch version: 2.13.0+cpu
+Transformers version: 5.14.1
+Dataset: heldout_combined
+Row count: 722
+Label distribution: contradiction=158, entailment=367, neutral=197
+Duplicate nli_id count: 0
+
+Accuracy: 0.9460
+Macro F1: 0.9358
+Weighted F1: 0.9438
+Entailment recall: 0.9918
+Neutral recall: 1.0000
+Neutral precision: 0.9850
+Contradiction recall: 0.7722
+Contradiction F1: 0.8622
+
+Per-label metrics:
+Label             Precision      Recall          F1     Support
+contradiction        0.9760      0.7722      0.8622         158
+entailment           0.9169      0.9918      0.9529         367
+neutral              0.9850      1.0000      0.9924         197
+
+Confusion matrix (rows = gold, columns = predicted):
+gold\pred         contradiction     entailment        neutral
+contradiction               122             33              3
+entailment                    3            364              0
+neutral                       0              0            197
+(Also saved separately as <dataset>_confusion_matrix.csv)
+
+Total incorrect predictions: 39
+
+Incorrect predictions:
+nli_id      source_id   split         gold_label    pred_label    confidence error_type          hypothesis                                                  
+NLI_000195  PC_S101     internal_test contradiction entailment    0.9959     negation_change     As a further example, if A instigates B to set fire to a house, and B, being of unsound mind and unable to know the act is wrong, sets fire to it, B commits an offence, but A is guilty of encouraging the offence and is liable to its punishment.
+NLI_000197  PC_S106     internal_test contradiction entailment    0.9991     exception_removed   When an act is encouraged with the intention of causing a particular effect, and the act for which the encourager is liable causes a different effect, the encourager is liable for the effect caused, in the same way and to the same extent as if he had encouraged the act intending that effect.
+NLI_000290  PC_S185     internal_test contradiction entailment    0.9659     modality_change     For example, if a lawfully empowered public servant promulgates an order that a religious procession may pass down a certain street, and A knowingly disobeys it and thereby causes danger of a riot, A commits this offence.
+NLI_000345  PC_S19      internal_test contradiction neutral       0.8967     role_change         Third, every commissioned officer in the naval, military, or air forces of the Republic of Sri Lanka is a private citizen.
+NLI_000348  PC_S19      internal_test contradiction neutral       0.8760     role_change         Fourth, every judge is a private citizen.
+NLI_000379  PC_S190     internal_test contradiction entailment    0.6755     role_change         An investigation directed by law before a proceeding in a police officer is a stage of a judicial proceeding, even if it does not take place before a Court of Justice.
+NLI_000545  PC_S286B_1  internal_test contradiction entailment    0.7118     modality_change     A person who provides a service by means of a computer may take all steps necessary to ensure that the computer facility is not used to commit an offence relating to the sexual abuse of a child.
+NLI_000548  PC_S286B_2  internal_test contradiction entailment    0.9862     modality_change     A person referred to in subsection (1) who knows that any such computer facility is being used to commit an act constituting an offence relating to the sexual abuse of a child may at once inform the officer in charge of the nearest police station of that fact, and give any information he has about the act and the identity of the alleged offender.
+NLI_000577  PC_S308A_2  internal_test entailment    contradiction 0.9971     none                A person who commits this offence may also be ordered to pay compensation, in an amount fixed by the court, to the person against whom the offence was committed for the injuries caused.
+NLI_000756  PC_S489     internal_test contradiction entailment    0.9416     negation_change     If the offence to which the oath, engagement, or obligation relates is punishable with death or imprisonment for twenty years, the person cannot be fined.
+NLI_000759  PC_S489     internal_test contradiction entailment    0.8582     negation_change     If the offence to which the oath, engagement, or obligation relates is punishable with death or imprisonment for twenty years, the person cannot be punished with both imprisonment and a fine.
+NLI_000776  PC_S67A     internal_test contradiction entailment    0.9949     modality_change     In every case where a person is found guilty of one of several offences named in the judgment, but it is doubtful which of them he is guilty of, he may be punished for the offence that carries the lowest punishment, unless the same punishment is provided for all of them.
+NLI_000788  PC_S71      internal_test contradiction entailment    0.9985     exception_removed   This is so even if the court had no jurisdiction to make that judgment or order.
+NLI_000804  PC_S92_4    internal_test contradiction entailment    0.9955     exception_removed   A person does not lose the right of private defence against an act done, or attempted, by a public servant.
+NLI_000807  PC_S92_4    internal_test contradiction entailment    0.9913     exception_removed   A person does not lose the right of private defence against an act done, or attempted, on the direction of a public servant, or unless that person states the authority under which he acts, or, if he has written authority, produces it when demanded.
+NLI_000003  MA_S10      external_test contradiction entailment    0.9986     modality_change     Every application for a maintenance order, or to enforce one, may be in writing, must be signed by the applicant or the person making it on his behalf, and is free of any stamp duty.
+NLI_000009  MA_S11_1    external_test contradiction entailment    0.7903     modality_change     If the Magistrate is satisfied that the facts in the affidavit are sufficient, he may issue a summons, together with a copy of the affidavit, on the person against whom the application is made, to appear and show cause why the application should not be granted.
+NLI_000012  MA_S11_1    external_test contradiction entailment    0.9902     modality_change     However, the Magistrate must at any time, in his discretion, make an interim order for the payment of a monthly allowance, which remains in force until an order on the application is made, unless it is earlier varied or revoked, and which takes effect from the date of the application or from any later date the Magistrate fixes.
+NLI_000014  MA_S11_2    external_test contradiction entailment    0.9984     modality_change     After whatever inquiry he considers necessary, the Magistrate may make an order allowing or refusing the application, and if necessary may make an order under section 5 or section 6.
+NLI_000023  MA_S13      external_test contradiction entailment    0.9988     modality_change     Subject to subsection (2) of section 12, all evidence taken by a Magistrate under this Act may be taken in the presence of the person against whom the application is made, or, when the Magistrate does not require his personal attendance, in the presence of his attorney-at-law, if any, and must be recorded in the manner prescribed for trials in the Magistrate's Court.
+NLI_000032  MA_S14_1    external_test contradiction entailment    0.9985     exception_removed   However, despite anything to the contrary in section 323 of that Act, an order under section 2 is not stayed because of the appeal.
+NLI_000038  MA_S15      external_test contradiction entailment    0.9960     modality_change     The forms set out in the Schedule to this Act, with whatever variations the circumstances of a case may require, may be used for the purposes stated in them.
+NLI_000048  MA_S20_1    external_test contradiction entailment    0.9921     modality_change     Despite the repeal of the Maintenance Ordinance, all proceedings instituted under that Ordinance, and all appeals from orders made under it, that were pending on the day before this Act came into force, may be heard and disposed of in all respects as though that Ordinance had not been repealed.
+NLI_000064  MA_S22      external_test entailment    contradiction 0.9975     none                'Non-marital', in relation to a child or offspring, means a child or offspring born to parents who are not married.
+NLI_000068  MA_S2_1     external_test contradiction entailment    0.9976     modality_change     Where a person who has sufficient means neglects or unreasonably refuses to maintain his or her spouse who is unable to maintain himself or herself, the Magistrate must, on an application for maintenance and on proof of that neglect or unreasonable refusal, order that person to pay a monthly allowance for the maintenance of the spouse.
+NLI_000073  MA_S2_2     external_test contradiction entailment    0.9979     modality_change     Where a parent who has sufficient means neglects or refuses to maintain his or her child who is unable to maintain himself or herself, the Magistrate must, on an application for maintenance and on proof of that neglect or refusal, order that parent to pay a monthly allowance for the maintenance of the child.
+NLI_000080  MA_S2_3     external_test contradiction entailment    0.9978     modality_change     Where a parent who has sufficient means neglects or refuses to maintain his or her adult offspring who is unable to maintain himself or herself, the Magistrate must, on an application for maintenance and on proof of that neglect or refusal, order that parent to pay a monthly allowance for the maintenance of the adult offspring.
+NLI_000086  MA_S2_4     external_test contradiction entailment    0.9977     modality_change     Where a parent who has sufficient means neglects or refuses to maintain his or her disabled offspring who is unable to maintain himself or herself, the Magistrate must, on an application for maintenance and on proof of that neglect or refusal, order that parent to pay a monthly allowance for the maintenance of the disabled offspring.
+NLI_000093  MA_S2_5     external_test contradiction entailment    0.9986     exception_removed   Where a Magistrate makes an order for payment of an allowance on an application under subsection (1), (2), (3), or (4), the allowance is payable from the date the application for maintenance was made to the court, for reasons to be recorded, orders payment from another date.
+NLI_000095  MA_S2_6     external_test contradiction entailment    0.9989     modality_change     Where an application is made for the maintenance of a child, adult offspring, or disabled offspring under subsection (2), (3), or (4), the court must, either on the application of the parties or of its own motion, add the other parent as a party and make whatever order is appropriate against one or both parents.
+NLI_000110  MA_S6_1     external_test contradiction entailment    0.9992     modality_change     If a person entitled to receive payment under a maintenance order applies, and it appears to the Magistrate that the respondent has defaulted in paying maintenance for more than two months, the Magistrate must, after inquiry, make an order called an attachment of salary order.
+NLI_000133  MA_S6_2     external_test contradiction entailment    0.9234     modality_change     Before making an order under subsection (1), the Magistrate may give notice to the person he proposes to serve it on, to show cause why the order should not be made, and require him to furnish the court, within the period stated, with the respondent's salary particulars.
+NLI_000135  MA_S6_2     external_test contradiction entailment    0.9993     modality_change     An order under subsection (1) may be appealed to a High Court established by Article 154P of the Constitution by any person aggrieved by it, but despite the appeal the Magistrate must decide to continue proceedings under this Act, and section 14 of this Act applies to every such appeal.
+NLI_000138  MA_S6_2     external_test entailment    contradiction 0.6932     none                The Magistrate may also, by an order served on the respondent, require him to furnish the court, within the period stated, with a statement giving the name and address of his employer or employers if he has more than one, the particulars of his salary including deductions so far as he knows them, and any other particulars needed to enable his employer or employers to identify him.
+NLI_000139  MA_S6_3     external_test contradiction entailment    0.9990     exception_removed   A statement furnished in compliance with an order under paragraph (b) of subsection (2) is, in any court proceedings, received as evidence and treated as prima facie proof of the particulars referred to in that paragraph.
+NLI_000156  MA_S7_1     external_test contradiction entailment    0.9981     modality_change     Where a maintenance order is made under this Act, the Magistrate must direct the respondent to deposit the amount due under the order each month, on or before the date stated in the order, in favour of the person entitled to payment, at the post office or bank stated in the order, and that person may draw the amount so deposited from that post office or bank.
+NLI_000167  MA_S8       external_test contradiction neutral       0.8425     modality_change     On the application of any person receiving, or ordered to pay, a monthly allowance under this Act, and on proof of a change in the circumstances of any person for whose benefit or against whom a maintenance order has been made, the Magistrate must either cancel the order or make whatever alteration in the allowance he thinks fit.
+NLI_000169  MA_S8       external_test contradiction entailment    0.9989     exception_removed   The cancellation or alteration takes effect from the date the application for it was made to the court, for reasons to be recorded, orders otherwise.
+NLI_000172  MA_S9       external_test contradiction entailment    0.8954     modality_change     A copy of the maintenance order, certified under the hand of the Magistrate, may be given without payment to the person in whose favour it is made, or to his or her guardian or a person having actual custody of that person, or to the person to whom the allowance is to be paid.

@@ -1,0 +1,14 @@
+transformers
+datasets
+accelerate
+peft
+trl
+evaluate
+textstat
+bert-score
+sacrebleu
+sentencepiece
+pandas
+numpy
+scikit-learn
+jupyter

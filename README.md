@@ -107,6 +107,53 @@ The backend's evidence-linking and NLI-verification logic have automated tests c
 
    Add `-v` for per-test output, or `python -m pytest tests/test_evidence.py` to run a single file.
 
+## Research and model-development code
+
+The `backend/` and `frontend/` above are the deployable prototype. The three
+folders below are the supporting code that produced its statute dataset, the
+selected simplification model and the fine-tuned NLI verifier. Each is
+provided as code only — raw statute PDFs/CSVs, the NLI training data, and all
+trained model checkpoints are excluded (see each folder's own note below);
+none of it is needed to run the app itself, which pulls the fine-tuned NLI
+checkpoint from Hugging Face Hub at `NLI_MODEL_PATH` instead.
+
+- **`data_processing/`** — `scripts/extract_penal_code_dataset.py` extracts
+  and cleans statute PDFs into the structured CSV dataset described in
+  Chapter 5 (§5.3). Install its own dependencies with
+  `pip install -r data_processing/requirements.txt`. The source PDFs and
+  output CSVs are not included; the statutes are the Sri Lankan Penal Code
+  and the Maintenance Act No. 37 of 1999, both publicly available via LawNet
+  Sri Lanka.
+
+- **`model_lab/`** — the six-candidate simplification-model comparison
+  (`notebooks/baseline_eval_4/*.ipynb`, one per model: Qwen3 8B, Mistral 7B
+  Instruct, Gemma 3 4B IT, Llama 3.2 3B Instruct, BART Large, FLAN-T5 Large)
+  plus three earlier iteration rounds (`baseline_eval`, `_2`, `_3`) showing
+  the prompt-refinement history, and `notebooks/source_metrics.ipynb`, which
+  produced the source-vs-reference readability figures in Chapter 7. See
+  `model_notes.md`, `model_evaluation.md` and `review.md` for the model
+  selection rationale. `requirements-colab.txt` lists the notebook
+  dependencies. The 20-provision reviewed pilot dataset and each model's raw
+  per-row output are not included; only the aggregate summary metrics
+  (`results/source_reference_metrics_summary.csv`) and result charts are.
+
+- **`nli_baseline_testing_and_finetuning/`** — fine-tunes and evaluates the
+  NLI verifier. `finetuning/finetune_deberta.py` (and
+  `finetune_deberta_v3_base.py` for the alternate base tried) fine-tunes
+  `cross-encoder/nli-deberta-v3-small` into the checkpoint used in
+  production; `evaluation_scripts/` holds the per-model evaluation harness
+  (confusion matrix, classification report, summary metrics) used to compare
+  candidate checkpoints and produce the held-out results in Chapters 5 and 7;
+  `make_v2_datasets.py` and `cache_one_nli_model.py` are dataset-construction
+  and model-caching utilities. See its own `README.md` for the full dataset
+  and fine-tuning methodology. The NLI training/test datasets and every
+  trained checkpoint are not included (the checkpoint used by the app is
+  hosted on Hugging Face Hub instead); `outputs/` and
+  `outputs_rerun_20260803_012453/` keep only the aggregate metrics, confusion
+  matrices and classification reports from each evaluation run — the raw
+  per-example prediction files (which embed the claim/evidence text) are
+  excluded.
+
 ## Notes
 
 - There is currently no linter or CI configured in this repo.

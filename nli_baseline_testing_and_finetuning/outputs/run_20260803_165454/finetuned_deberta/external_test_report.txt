@@ -1,0 +1,49 @@
+NLI Diagnostic Baseline Report
+Model: D:\nli_baseline_test\finetuning\finetuned_deberta
+Device: cpu
+Batch size: 16
+Max sequence length: 512
+PyTorch version: 2.13.0+cpu
+Transformers version: 5.14.1
+Dataset: external_test
+Row count: 175
+Label distribution: contradiction=43, entailment=88, neutral=44
+Duplicate nli_id count: 0
+
+Accuracy: 0.9371
+Macro F1: 0.9321
+Weighted F1: 0.9366
+Entailment recall: 0.9545
+Neutral recall: 0.9773
+Neutral precision: 0.9348
+Contradiction recall: 0.8605
+Contradiction F1: 0.8916
+
+Per-label metrics:
+Label             Precision      Recall          F1     Support
+contradiction        0.9250      0.8605      0.8916          43
+entailment           0.9438      0.9545      0.9492          88
+neutral              0.9348      0.9773      0.9556          44
+
+Confusion matrix (rows = gold, columns = predicted):
+gold\pred         contradiction     entailment        neutral
+contradiction                37              5              1
+entailment                    2             84              2
+neutral                       1              0             43
+(Also saved separately as <dataset>_confusion_matrix.csv)
+
+Total incorrect predictions: 11
+
+Incorrect predictions:
+nli_id      source_id   split         gold_label    pred_label    confidence error_type          hypothesis                                                  
+NLI_000014  MA_S11_2    external_test contradiction entailment    0.9990     modality_change     After whatever inquiry he considers necessary, the Magistrate may make an order allowing or refusing the application, and if necessary may make an order under section 5 or section 6.
+NLI_000019  MA_S12_1    external_test contradiction neutral       0.9923     role_change         The Magistrate may proceed in the manner provided in Chapters V and VI of the Code of Criminal Procedure Act, No. 15 of 1979, to compel the attendance of the person against whom the application is made, and of any person whose evidence is required by the applicant, by that person, or by a police officer, and to compel the production of any document needed for the inquiry.
+NLI_000027  MA_S13      external_test entailment    contradiction 0.9981     none                In any proceedings under this Act, the person against whom the application is made may give evidence on oath or affirmation as an ordinary witness, and each spouse is a competent witness against the other.
+NLI_000031  MA_S14_1    external_test neutral       contradiction 0.9996     unsupported_locatio Sections 320 to 330, and sections 357 and 358, of the Code of Criminal Procedure Act, No. 15 of 1979, apply to the appeal with the necessary changes, and the matter must be heard in the District Court of the area.
+NLI_000032  MA_S14_1    external_test contradiction entailment    0.9998     exception_removed   However, despite anything to the contrary in section 323 of that Act, an order under section 2 is not stayed because of the appeal.
+NLI_000033  MA_S14_1    external_test entailment    neutral       1.0000     none                However, despite anything to the contrary in section 323 of that Act, an order under section 2 is not stayed because of the appeal, unless the High Court directs otherwise for reasons to be recorded.
+NLI_000064  MA_S22      external_test entailment    contradiction 1.0000     none                'Non-marital', in relation to a child or offspring, means a child or offspring born to parents who are not married.
+NLI_000093  MA_S2_5     external_test contradiction entailment    0.9697     exception_removed   Where a Magistrate makes an order for payment of an allowance on an application under subsection (1), (2), (3), or (4), the allowance is payable from the date the application for maintenance was made to the court, for reasons to be recorded, orders payment from another date.
+NLI_000135  MA_S6_2     external_test contradiction entailment    0.9204     modality_change     An order under subsection (1) may be appealed to a High Court established by Article 154P of the Constitution by any person aggrieved by it, but despite the appeal the Magistrate must decide to continue proceedings under this Act, and section 14 of this Act applies to every such appeal.
+NLI_000150  MA_S6_8     external_test entailment    neutral       0.9819     none                A person to whom an attachment of salary order is directed must, subject to this Act, comply with the order, or, if it is later varied under subsection (7), with the order as varied.
+NLI_000169  MA_S8       external_test contradiction entailment    0.9879     exception_removed   The cancellation or alteration takes effect from the date the application for it was made to the court, for reasons to be recorded, orders otherwise.

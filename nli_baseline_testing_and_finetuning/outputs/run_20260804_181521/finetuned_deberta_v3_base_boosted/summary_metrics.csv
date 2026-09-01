@@ -1,0 +1,4 @@
+dataset,rows,batch_size,max_length,accuracy,macro_f1,weighted_f1,entailment_precision,entailment_recall,entailment_f1,neutral_precision,neutral_recall,neutral_f1,contradiction_precision,contradiction_recall,contradiction_f1
+internal_test,547,16,512,0.974406,0.971199,0.974339,0.97153,0.978495,0.975,1.0,1.0,1.0,0.946903,0.930435,0.938596
+external_test,175,16,512,0.874286,0.859552,0.866695,0.823529,0.954545,0.884211,1.0,1.0,1.0,0.862069,0.581395,0.694444
+heldout_combined,722,16,512,0.950139,0.944,0.949341,0.932115,0.972752,0.952,1.0,1.0,1.0,0.929577,0.835443,0.88

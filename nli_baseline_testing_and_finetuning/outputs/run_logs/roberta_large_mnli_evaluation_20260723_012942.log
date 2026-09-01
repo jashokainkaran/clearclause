@@ -1,0 +1,40 @@
+﻿**********************
+Windows PowerShell transcript start
+Start time: 20260723012954
+Username: ASHOK-X360\jasho
+RunAs User: ASHOK-X360\jasho
+Configuration Name: 
+Machine: ASHOK-X360 (Microsoft Windows NT 10.0.26200.0)
+Host Application: powershell -NoProfile -ExecutionPolicy Bypass -File D:\nli_baseline_test\run_and_log_visible_progress.ps1 -PythonExe D:\nli_baseline_test\.venv\Scripts\python.exe -ScriptPath D:\nli_baseline_test\evaluation_scripts\evaluate_roberta_large_mnli.py -LogPath D:\nli_baseline_test\outputs\run_logs\roberta_large_mnli_evaluation_20260723_012942.log
+Process ID: 7100
+PSVersion: 5.1.26100.8875
+PSEdition: Desktop
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1.26100.8875
+BuildVersion: 10.0.26100.8875
+CLRVersion: 4.0.30319.42000
+WSManStackVersion: 3.0
+PSRemotingProtocolVersion: 2.3
+SerializationVersion: 1.1.0.1
+**********************
+Start: 2026-07-23 01:29:54
+Python: D:\nli_baseline_test\.venv\Scripts\python.exe
+Script: D:\nli_baseline_test\evaluation_scripts\evaluate_roberta_large_mnli.py
+
+Done. Summary:
+         dataset  rows  batch_size  max_length  accuracy  macro_f1  weighted_f1  entailment_precision  entailment_recall  entailment_f1  neutral_precision
+neutral_recall  neutral_f1  contradiction_precision  contradiction_recall  contradiction_f1
+      validation   530           1         512  0.905660  0.892466     0.905217              0.954198           0.922509       0.938086           0.797688
+           1.0    0.887460                 0.968421              0.760331          0.851852
+   internal_test   634           1         512  0.878549  0.855645     0.879535              0.973941           0.903323       0.937304           0.708861
+           1.0    0.829630                 1.000000              0.666667          0.800000
+   external_test   175           1         512  0.760000  0.682516     0.717468              0.745283           0.897727       0.814433           0.758621
+           1.0    0.862745                 0.909091              0.232558          0.370370
+heldout_combined   809           1         512  0.852905  0.820597     0.847489              0.915254           0.902148       0.908654           0.718644
+           1.0    0.836292                 0.990099              0.561798          0.716846
+
+End: 2026-07-23 01:46:30
+Exit code: 0
+**********************
+Windows PowerShell transcript end
+End time: 20260723014630
+**********************

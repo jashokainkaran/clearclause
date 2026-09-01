@@ -1,0 +1,6 @@
+model,download_status,download_exit,evaluation_status,evaluation_exit,output_folder
+"RoBERTa-large-MNLI",SUCCESS,0,SUCCESS,0,"D:\nli_baseline_test\outputs_rerun_20260803_012453\roberta_large_mnli"
+"DeBERTa-v3-base",SUCCESS,0,SUCCESS,0,"D:\nli_baseline_test\outputs_rerun_20260803_012453\deberta_v3_base"
+"ModernBERT-base-NLI",SUCCESS,0,SUCCESS,0,"D:\nli_baseline_test\outputs_rerun_20260803_012453\modernbert_nli"
+"DeBERTa-v3-small",SUCCESS,0,SUCCESS,0,"D:\nli_baseline_test\outputs_rerun_20260803_012453\deberta_v3_small"
+"DistilRoBERTa-NLI",SUCCESS,0,SUCCESS,0,"D:\nli_baseline_test\outputs_rerun_20260803_012453\distilroberta_nli"

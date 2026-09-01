@@ -1,0 +1,9 @@
+ClearClause Sequential NLI Download and Evaluation
+Start: 08/03/2026  1:24:41.48
+Project root: D:\nli_baseline_test\
+Python: D:\nli_baseline_test\.venv\Scripts\python.exe
+HF_HOME: E:\AI_Cache\huggingface_cache
+HF_HUB_CACHE: E:\AI_Cache\huggingface_cache\hub
+Output root for this run: D:\nli_baseline_test\outputs_rerun_20260803_012441
+
+ERROR: Logging helper missing: D:\nli_baseline_test\run_and_log_visible_progress.ps1
